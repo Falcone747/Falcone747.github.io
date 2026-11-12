@@ -1,0 +1,36 @@
+<svg width="1135" height="260" viewBox="40 30 1135 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">EXIOR</title>
+  <desc id="desc">Logo EXIOR — symbole méta-exocortical avec wordmark premium.</desc>
+  <defs>
+    <linearGradient id="exiorCore" x1="72" y1="48" x2="248" y2="272" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FAFC"/>
+      <stop offset="0.48" stop-color="#94A3B8"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="exiorStroke" x1="50" y1="50" x2="270" y2="270" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E2E8F0"/>
+      <stop offset="0.5" stop-color="#64748B"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <filter id="softShadow" x="30" y="30" width="260" height="260" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <g >
+    <path d="M160 38L265.66 99V221L160 282L54.34 221V99L160 38Z" stroke="url(#exiorStroke)" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M160 76L232.75 118V202L160 244L87.25 202V118L160 76Z" stroke="#475569" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M54.34 99L87.25 118M265.66 99L232.75 118M265.66 221L232.75 202M54.34 221L87.25 202" stroke="#64748B" stroke-width="6" stroke-linecap="round"/>
+    <path d="M160 76V244" stroke="#64748B" stroke-width="7" stroke-linecap="round"/>
+    <path d="M87.25 118L232.75 202" stroke="#475569" stroke-width="7" stroke-linecap="round"/>
+    <path d="M232.75 118L87.25 202" stroke="#94A3B8" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="160" cy="160" r="34" fill="url(#exiorCore)" stroke="#0F172A" stroke-width="8"/>
+    <circle cx="160" cy="160" r="10" fill="#F8FAFC"/>
+  </g>
+  <g fill="#F1F5F9">
+    <path d="M373.2 100H520.8V127.6H408.8V146.4H506.4V172.8H408.8V192.4H522.8V220H373.2V100Z"/>
+    <path d="M548.1 100H592.5L638.7 145.6L684.9 100H728.1L660.9 160L731.7 220H686.1L637.5 173.2L588.5 220H544.1L615.7 158.8L548.1 100Z"/>
+    <path d="M762.5 100H798.1V220H762.5V100Z"/>
+    <path d="M899.1 96.8C939.9 96.8 970.7 123.6 970.7 160C970.7 196.4 939.9 223.2 899.1 223.2C858.3 223.2 827.5 196.4 827.5 160C827.5 123.6 858.3 96.8 899.1 96.8ZM899.1 126C879.1 126 864.3 139.6 864.3 160C864.3 180.4 879.1 194 899.1 194C919.1 194 933.9 180.4 933.9 160C933.9 139.6 919.1 126 899.1 126Z"/>
+    <path d="M1002 100H1104.4C1134.8 100 1154 116 1154 141.6C1154 160 1143.2 173.6 1125.2 179.6L1160 220H1117.6L1087.2 184H1037.6V220H1002V100ZM1037.6 127.6V157.6H1099.6C1110.8 157.6 1117.2 152 1117.2 142.4C1117.2 133.2 1110.8 127.6 1099.6 127.6H1037.6Z"/>
+  </g>
+</svg>

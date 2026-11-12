@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">EXIOR Symbol</title>
+  <desc id="desc">Symbole EXIOR — projection tesseract, contrôle excitateur/inhibiteur, centre exocortical.</desc>
+  <defs>
+    <linearGradient id="core" x1="72" y1="48" x2="248" y2="272" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F8FAFC"/><stop offset="0.48" stop-color="#94A3B8"/><stop offset="1" stop-color="#0F172A"/></linearGradient>
+    <linearGradient id="stroke" x1="50" y1="50" x2="270" y2="270" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E2E8F0"/><stop offset="0.5" stop-color="#64748B"/><stop offset="1" stop-color="#111827"/></linearGradient>
+  </defs>
+  <path d="M160 38L265.66 99V221L160 282L54.34 221V99L160 38Z" stroke="url(#stroke)" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M160 76L232.75 118V202L160 244L87.25 202V118L160 76Z" stroke="#334155" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M54.34 99L87.25 118M265.66 99L232.75 118M265.66 221L232.75 202M54.34 221L87.25 202" stroke="#64748B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M160 76V244" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <path d="M87.25 118L232.75 202" stroke="#475569" stroke-width="7" stroke-linecap="round"/>
+  <path d="M232.75 118L87.25 202" stroke="#94A3B8" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="160" cy="160" r="34" fill="url(#core)" stroke="#0F172A" stroke-width="8"/>
+  <circle cx="160" cy="160" r="10" fill="#F8FAFC"/>
+</svg>
