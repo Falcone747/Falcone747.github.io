@@ -207,6 +207,70 @@
       body{font-size:11pt}
       a{text-decoration:none}
     }
+    /* Bloc d’acceptation et de paiement, visible seulement si ?p= identifiant Stripe valide */
+    .pay-jump{
+      display:none;
+      border-top:.5pt solid var(--line);
+    }
+    .pay-jump:not([hidden]){display:block}
+    .pay-jump a{
+      display:inline-block;
+      font-size:12.5px;font-weight:600;letter-spacing:.02em;text-transform:none;
+      color:var(--ink);text-decoration:underline;text-underline-offset:3px;
+      padding:10px 0 12px;
+    }
+    .pay-jump a:hover,.pay-jump a:focus-visible{color:#000}
+    .accept{
+      display:none;
+      background:var(--grey);
+      border-top:1.15pt solid var(--ink);
+      padding:40px 0 56px;
+    }
+    .accept:not([hidden]){display:block}
+    .accept h2{margin-bottom:12px}
+    .accept .note{
+      font-size:15.5px;line-height:1.55;color:var(--txt);
+      max-width:46em;margin-bottom:20px;
+    }
+    .accept-box{
+      background:#fff;
+      border:.7pt solid var(--ink);
+      border-radius:8px;
+      padding:22px 24px;
+      max-width:46em;
+    }
+    .accept-check{
+      display:flex;align-items:flex-start;gap:12px;
+      font-size:15.5px;line-height:1.45;color:var(--ink);
+      cursor:pointer;margin:0 0 18px;
+    }
+    .accept-check input{
+      appearance:auto;
+      width:20px;height:20px;margin:2px 0 0;flex:none;
+      accent-color:var(--ink);
+      cursor:pointer;
+    }
+    button.btn{
+      border:0;font-family:inherit;cursor:pointer;
+    }
+    button.btn:disabled,
+    button.btn:disabled:hover{
+      opacity:.4;cursor:not-allowed;background:var(--ink);color:#fff;
+    }
+    body.has-pay{scroll-padding-top:176px}
+    @media (max-width:720px){
+      .pay-jump a{padding:12px 0;font-size:13.5px}
+      .accept{padding:28px 0 44px}
+      .accept-box{padding:18px 16px}
+      .accept .note{font-size:15px;margin-bottom:16px}
+      .accept-check{font-size:15px;gap:10px}
+      .accept-check input{width:22px;height:22px}
+      .accept .btn{width:100%;justify-content:center;min-height:48px}
+      body.has-pay{scroll-padding-top:210px}
+    }
+    @media print{
+      .pay-jump,.accept{display:none !important}
+    }
   </style>
 </head>
 <body>
@@ -231,6 +295,11 @@
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v8m0 0L5.2 7.2M8 10l2.8-2.8M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Télécharger le PDF
       </a>
+    </div>
+    <div id="pay-jump" class="pay-jump" hidden>
+      <div class="wrap-wide">
+        <a href="#acceptation">Aller à l’acceptation et au paiement</a>
+      </div>
     </div>
   </nav>
 
@@ -404,6 +473,22 @@
     </div>
   </footer>
 
+  <section id="acceptation" class="accept" hidden>
+    <div class="wrap">
+      <div class="eyebrow"><i></i>Acceptation et paiement</div>
+      <h2>Accepter et payer</h2>
+      <p class="note">Après avoir coché la case ci-dessous, vous êtes dirigé vers la page de paiement sécurisée Stripe. Celle-ci vous demande également de confirmer cette acceptation et en conserve la preuve.</p>
+      <div class="accept-box">
+        <label class="accept-check" for="accept-cg">
+          <input type="checkbox" id="accept-cg" name="accept-cg">
+          <span>J’ai lu et j’accepte mon devis EXIOR et les présentes Conditions générales de prestation.</span>
+        </label>
+        <button type="button" class="btn" id="accept-pay" disabled>Accepter et payer</button>
+      </div>
+    </div>
+  </section>
+
+
 <script>
 /* Téléchargement local du PDF des conditions générales, sans traceur. */
 (function(){
@@ -425,6 +510,32 @@
       t.remove();
       setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
     });
+  });
+})();
+</script>
+
+<script>
+/* Acceptation puis paiement Stripe : le paramètre p doit être un identifiant, jamais une URL. */
+(function(){
+  var RE = /^[A-Za-z0-9]{10,40}$/;
+  var params = new URLSearchParams(window.location.search);
+  var p = params.get("p") || "";
+  if (!RE.test(p)) return;
+  var jump = document.getElementById("pay-jump");
+  var box = document.getElementById("acceptation");
+  var cb = document.getElementById("accept-cg");
+  var btn = document.getElementById("accept-pay");
+  if (!jump || !box || !cb || !btn) return;
+  document.body.classList.add("has-pay");
+  jump.hidden = false;
+  box.hidden = false;
+  function sync(){ btn.disabled = !cb.checked; }
+  cb.addEventListener("change", sync);
+  sync();
+  btn.addEventListener("click", function(){
+    if (!cb.checked) return;
+    if (!RE.test(p)) return;
+    window.location.href = "https://buy.stripe.com/" + p;
   });
 })();
 </script>
