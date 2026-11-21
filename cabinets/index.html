@@ -382,8 +382,8 @@ section { padding: 84px 0; }
   margin-bottom: 24px;
 }
 .demo-tabs {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -686,8 +686,9 @@ section { padding: 84px 0; }
   font-size: 30px;
   font-weight: 700;
   color: var(--ink);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.1;
+  white-space: nowrap;
 }
 .price-card.featured .price-amount { color: #FFFFFF; }
 .price-unit {
@@ -913,6 +914,7 @@ details.faq-item p {
   .am-arrow { text-align: center; font-size: 14px; font-weight: 700; color: var(--mute); line-height: 1; }
   .am-agents { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
   .am-agent { background: #FFFFFF; border: 1px solid #D6D9DF; border-radius: 6px; padding: 7px 8px; font-size: 12px; font-weight: 600; color: var(--ink); }
+  .demo-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cmp-table { font-size: 12.5px; }
   .cmp-table th, .cmp-table td { padding: 10px 10px; }
 }
@@ -1520,7 +1522,7 @@ h1, h2, h3 { overflow-wrap: break-word; text-wrap: balance; }
           <tbody>
             <tr>
               <td>Coût mensuel de référence</td>
-              <td><strong>~4 560 € / mois</strong> chargés (assistant : ~3 375 €)</td>
+              <td><strong>~4 560&nbsp;€ / mois</strong> chargés (assistant&nbsp;: ~3 375&nbsp;€)</td>
               <td><strong>2 990 € HT / mois</strong> (+ 990 € HT mise en place)</td>
             </tr>
             <tr>
