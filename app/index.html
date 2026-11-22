@@ -98,6 +98,18 @@ svg text{fill:var(--t3);font-size:10px}
 .pal .hit.on,.pal .hit:hover{background:rgba(124,58,237,.16)}
 .hintk{font-size:11px;color:var(--t3);border:1px solid var(--line);border-radius:8px;padding:3px 8px;letter-spacing:.04em}
 
+
+.burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;padding:0;font-size:18px}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;left:0;top:0;bottom:0;z-index:8;width:248px;transform:translateX(-110%);transition:transform .2s ease;box-shadow:none}
+  aside.open{transform:none;box-shadow:24px 0 60px rgba(0,0,0,.45)}
+  .burger{display:inline-flex}
+  .top{padding:14px 16px}.view{padding:18px 16px 80px}
+  .g6,.g4,.g3,.g2,.g22,.chat{grid-template-columns:1fr}
+  .meter{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -367,11 +379,11 @@ function render(){ if(!S.t||!S.k){$("#root").innerHTML=`<div class="login card h
  $("#root").innerHTML=`<div class="app"><aside><div class="logo"><div class="mark">E</div><div><b>EXIOR</b><small>META OS</small></div></div>
  ${NAV.map(([k,l])=>`<div class="nav ${S.view==k?"on":""}" onclick="go('${k}')">${ico(k)}<span>${l}</span>${k=="validations"&&pend?`<span class="cnt">${pend}</span>`:""}</div>`).join("")}
  <div class="side-foot"><b>${d.agents.filter(a=>a.statut=="actif").length} agents actifs</b><br>${fmt(Object.values(d.jumeau).reduce((a,b)=>a+b,0))} objets dans le jumeau<br><span style="color:var(--v3)">Métasystème opérationnel</span><div class="small muted" style="margin-top:8px">Démo — entreprise fictive</div></div></aside>
- <main><div class="top"><div><h1>${esc(d.tenant.raison_sociale)}</h1><div class="sub">${esc(NAV.find(n=>n[0]==S.view)[1])}</div></div><span class="pill ok"><span class="dot"></span>${d.tenant.statut=="actif"?"Actif":esc(d.tenant.statut)}</span><span class="pill">Offre ${esc(d.tenant.plan)}</span><div class="sp"></div>
+ <main><div class="top"><button class="btn ghost sm burger" onclick="document.querySelector('aside').classList.toggle('open')" aria-label="Menu">☰</button><div><h1>${esc(d.tenant.raison_sociale)}</h1><div class="sub">${esc(NAV.find(n=>n[0]==S.view)[1])}</div></div><span class="pill ok"><span class="dot"></span>${d.tenant.statut=="actif"?"Actif":esc(d.tenant.statut)}</span><span class="pill">Offre ${esc(d.tenant.plan)}</span><div class="sp"></div>
  <div class="meter"><small>${fmt(u.taches)} / ${fmt(u.incluses)} tâches ce mois</small><div class="bar"><i style="width:${Math.min(100,100*u.taches/u.incluses)}%"></i></div></div><button class="btn ghost sm" onclick="openPal()" title="Palette de commandes">⌘K</button><button class="btn sm" onclick="go('conversation')">✦ Demander</button></div>
  <div class="view">${V[S.view](d)}</div></main></div>`;
  const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight}
-function go(v){S.view=v;location.hash="#/"+v;render()}
+function go(v){S.view=v;location.hash="#/"+v;render();document.querySelector('aside')?.classList.remove('open')}
 async function load(){S.d=appliquer(); render(); if(Q.get("palette")==="1")openPal()}
 async function ask(t){const q=t||$("#q").value.trim();if(!q)return;const m=$("#msgs");m.insertAdjacentHTML("beforeend",`<div class="m u">${esc(q)}</div><div class="m a" id="pending">…</div>`);m.scrollTop=m.scrollHeight;if($("#q"))$("#q").value="";
  try{const r=await api(`/tenants/${S.t}/chat`,{method:"POST",body:JSON.stringify({message:q})});$("#pending").outerHTML=`<div class="m a">${esc(r.reponse)}<div class="meta"><span class="chip ${r.revue.ok?"g":""}">${r.revue.ok?"✓ vérifié par le réviseur":"bloqué par le réviseur"}</span><span class="chip">${esc(r.modele)}</span>${r.escalade?'<span class="chip">escalade</span>':""}${r.skill?'<span class="chip">skill appris</span>':""}${r.outils.map(o=>`<span class="chip">${o}</span>`).join("")}<span>${fmt(r.cout_usd*0.92,4)} €</span></div></div>`;S.d.usage.taches++}catch(e){$("#pending").textContent="Erreur : "+e.message}}
