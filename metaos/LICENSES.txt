@@ -174,3 +174,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 ==================================================================
 Autres dépendances : React, Radix UI (MIT), lucide-react (ISC), Motion, Tailwind CSS, class-variance-authority, clsx, tailwind-merge, tw-animate-css.
+
+==================================================================
+Geist Mono (c) Vercel, SIL Open Font License 1.1 (via @fontsource-variable/geist-mono).
