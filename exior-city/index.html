@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23120a22'/%3E%3Cpath d='M16 3 L28 16 L16 29 L4 16 Z' fill='%237C3AED'/%3E%3Cpath d='M16 9 L22 16 L16 23 L10 16 Z' fill='%23E9D5FF'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#07060f" />
+    <meta name="description" content="EXIOR City — a neon open-world night metropolis. Drive, walk, and run contracts after dusk." />
+    <title>EXIOR CITY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Outfit:wght@360;500;600&display=swap" rel="stylesheet" />
+    <script type="module">
+      const parts = [
+        "./assets/index-FIDVhTnB.js.part00",
+        "./assets/index-FIDVhTnB.js.part01",
+        "./assets/index-FIDVhTnB.js.part02",
+        "./assets/index-FIDVhTnB.js.part03",
+        "./assets/index-FIDVhTnB.js.part04",
+        "./assets/index-FIDVhTnB.js.part05",
+        "./assets/index-FIDVhTnB.js.part06",
+        "./assets/index-FIDVhTnB.js.part07",
+        "./assets/index-FIDVhTnB.js.part08",
+        "./assets/index-FIDVhTnB.js.part09"
+      ];
+      const blobs = await Promise.all(parts.map(async (src) => {
+        const res = await fetch(src);
+        if (!res.ok) throw new Error("Failed to load " + src + " (" + res.status + ")");
+        return res.blob();
+      }));
+      const blob = new Blob(blobs, { type: "text/javascript" });
+      const url = URL.createObjectURL(blob);
+      await import(url);
+    </script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Dqu7urvQ.css">
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="hurt"></div>
+    <div id="fade"></div>
+
+    <section id="screen-loading" class="screen on">
+      <p class="kicker">EXIOR</p>
+      <h1>CITY</h1>
+      <p id="load-note">Raising the ward grid</p>
+      <div class="bar"><span></span></div>
+    </section>
+
+    <section id="screen-title" class="screen">
+      <div class="title-block">
+        <p class="kicker">Dusk operations · Ward grid</p>
+        <h1>EXIOR<br />CITY</h1>
+        <p class="lede">A neon metropolis after the sun drops. Walk the wards, take a car, and keep the core moving.</p>
+        <div class="row">
+          <button id="btn-start" class="primary" type="button">Start</button>
+          <button id="btn-continue" class="ghost" type="button">Continue</button>
+          <button id="btn-settings" class="ghost" type="button">Settings</button>
+          <button id="btn-full" class="ghost" type="button">Fullscreen</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-tutorial" class="screen">
+      <div class="panel">
+        <p class="kicker" id="tut-count">1 / 5</p>
+        <h2 id="tut-title">Walk the ward</h2>
+        <p id="tut-body"></p>
+        <div class="row">
+          <button id="tut-next" class="primary" type="button">Next</button>
+          <button id="tut-skip" class="ghost" type="button">Skip</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-pause" class="screen">
+      <div class="panel left">
+        <p class="kicker">Paused</p>
+        <h2>Operator hold</h2>
+        <p id="pause-stats"></p>
+        <div class="col">
+          <button id="btn-resume" class="primary" type="button">Resume</button>
+          <button id="btn-jobs" class="ghost" type="button">Contracts</button>
+          <button id="btn-pause-settings" class="ghost" type="button">Settings</button>
+          <button id="btn-unstuck" class="ghost" type="button">Return to street</button>
+          <button id="btn-quit" class="ghost" type="button">Save and exit</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-settings" class="screen">
+      <div class="panel left scroll">
+        <p class="kicker">Settings</p>
+        <h2>Rig</h2>
+        <label class="field">Graphics
+          <div class="seg">
+            <button id="q-low" type="button">Low</button>
+            <button id="q-medium" type="button">Medium</button>
+            <button id="q-high" type="button">High</button>
+          </div>
+        </label>
+        <label class="field">Volume <span id="vol-val"></span>
+          <input id="opt-volume" type="range" min="0" max="1" step="0.01" />
+        </label>
+        <label class="field">Look sensitivity <span id="sens-val"></span>
+          <input id="opt-sens" type="range" min="0.15" max="1" step="0.01" />
+        </label>
+        <label class="check"><input id="opt-invert" type="checkbox" /> Invert look vertical</label>
+        <label class="check"><input id="opt-shake" type="checkbox" /> Camera shake</label>
+        <label class="check"><input id="opt-touch" type="checkbox" /> Touch controls</label>
+        <label class="check"><input id="opt-fps" type="checkbox" /> Frame rate counter</label>
+        <div class="controls">
+          <p class="kicker">Controls</p>
+          <ul>
+            <li><span>Move</span><b>WASD · left stick · joystick</b></li>
+            <li><span>Look</span><b>Mouse · right stick · drag</b></li>
+            <li><span>Sprint / boost</span><b>Shift · LB</b></li>
+            <li><span>Jump / handbrake</span><b>Space · A</b></li>
+            <li><span>Drive / exit</span><b>E · X</b></li>
+            <li><span>Brake</span><b>S · LT</b></li>
+            <li><span>Contracts</span><b>M · Y</b></li>
+            <li><span>Horn</span><b>H · B</b></li>
+            <li><span>Unstick car</span><b>R</b></li>
+            <li><span>Pause</span><b>Esc · Start</b></li>
+          </ul>
+        </div>
+        <button id="btn-settings-back" class="primary" type="button">Back</button>
+      </div>
+    </section>
+
+    <section id="screen-jobs" class="screen">
+      <div class="panel left scroll">
+        <p class="kicker">EXIOR board</p>
+        <h2>Contracts</h2>
+        <div id="jobs-list"></div>
+        <button id="btn-jobs-close" class="ghost" type="button">Close</button>
+      </div>
+    </section>
+
+    <section id="screen-down" class="screen">
+      <div class="down-copy">
+        <h2 id="down-title">SIGNAL LOST</h2>
+        <p id="down-sub"></p>
+      </div>
+    </section>
+
+    <div id="hud">
+      <div class="top">
+        <div class="balance">
+          <span>Balance</span>
+          <strong id="money">$500</strong>
+          <button id="btn-hud-pause" type="button">Pause</button>
+        </div>
+        <div class="center-read">
+          <canvas id="compass" width="420" height="36"></canvas>
+          <p id="obj-title"></p>
+          <p id="obj-text"></p>
+          <p id="obj-timer"></p>
+        </div>
+        <div class="heat">
+          <span id="phase-name">DUSK</span>
+          <div id="stars" aria-label="Heat">
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div id="bust"><em>Warden lock</em><b id="bust-fill"></b></div>
+        </div>
+      </div>
+      <div id="district"></div>
+      <div id="core-chip">Core live</div>
+      <div id="prompt"></div>
+      <div id="look-hint">Click to look</div>
+      <div id="speed"><b id="speed-num">0</b><small>km/h</small></div>
+      <div class="vitals">
+        <canvas id="minimap" width="180" height="180"></canvas>
+        <div id="hp"><span id="hp-fill"></span></div>
+      </div>
+      <div id="fps"></div>
+    </div>
+
+    <div id="toast"></div>
+
+    <div id="touch">
+      <div id="look"></div>
+      <div id="joy"><div id="knob"></div></div>
+      <div id="tbtns">
+        <button type="button" data-act="pause">Pause</button>
+        <button type="button" data-act="jobs">Jobs</button>
+        <button type="button" data-act="horn">Horn</button>
+        <button type="button" data-act="sprint">Run</button>
+        <button type="button" data-act="use">Use</button>
+        <button type="button" data-act="jump">Jump</button>
+        <button type="button" data-act="brake">Brake</button>
+      </div>
+    </div>
+
+  </body>
+</html>
