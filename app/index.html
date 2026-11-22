@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="fr">
+<base href="/app/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EXIOR — Meta OS (démo)</title>
+<style>
+:root{
+  --bg:#06030d;--bg2:#0b0617;--panel:#110a22;--panel2:#160d2c;--line:rgba(167,139,250,.16);--line2:rgba(167,139,250,.32);
+  --v:#7c3aed;--v2:#8b5cf6;--v3:#a78bfa;--v4:#c4b5fd;--glow:0 0 0 1px rgba(139,92,246,.35),0 10px 40px -10px rgba(124,58,237,.55);
+  --t:#f4f1ff;--t2:#b9b0d6;--t3:#7f76a3;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--r:16px;
+}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:radial-gradient(1200px 600px at 80% -10%,rgba(124,58,237,.22),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(139,92,246,.12),transparent 60%),var(--bg);
+  color:var(--t);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--v3);text-decoration:none}
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(17,10,34,.92),rgba(8,5,18,.92));padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 10px 22px}
+.mark{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 210deg,#7c3aed,#c084fc,#6d28d9,#7c3aed);box-shadow:var(--glow);display:grid;place-items:center;font-weight:800}
+.logo b{font-size:15px;letter-spacing:.14em}.logo small{display:block;color:var(--v3);font-size:11px;letter-spacing:.08em}
+.nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:var(--t2);cursor:pointer;font-weight:500;transition:.15s;position:relative}
+.nav:hover{background:rgba(139,92,246,.08);color:var(--t)}
+.nav.on{background:linear-gradient(90deg,rgba(124,58,237,.28),rgba(124,58,237,.06));color:#fff;box-shadow:inset 0 0 0 1px var(--line2)}
+.nav.on:before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--v2);box-shadow:0 0 12px var(--v2)}
+.nav svg{width:18px;height:18px;flex:none;opacity:.9}
+.nav .cnt{margin-left:auto;background:var(--v);color:#fff;border-radius:20px;font-size:11px;padding:1px 8px;font-weight:700}
+.side-foot{margin-top:auto;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(124,58,237,.06);font-size:12px;color:var(--t2)}
+.side-foot b{color:#fff}
+main{min-width:0}
+.top{display:flex;align-items:center;gap:14px;padding:18px 32px;border-bottom:1px solid var(--line);background:rgba(6,3,13,.7);backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
+.top h1{font-size:18px;margin:0;font-weight:650;letter-spacing:-.01em}
+.top .sub{color:var(--t3);font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line2);color:var(--v4);background:rgba(124,58,237,.1)}
+.pill.ok{color:var(--ok);border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.pill.warn{color:var(--warn);border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
+.pill.bad{color:var(--bad);border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.08)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+.sp{flex:1}
+.meter{width:170px}.meter .bar{height:6px;border-radius:6px;background:rgba(167,139,250,.14);overflow:hidden}.meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--v),var(--v3))}
+.meter small{color:var(--t3);font-size:11px}
+.view{padding:28px 32px 60px;max-width:1400px}
+.grid{display:grid;gap:16px}.g6{grid-template-columns:repeat(6,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1.4fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g22{grid-template-columns:1fr 1fr}
+.card{background:linear-gradient(180deg,rgba(22,13,44,.85),rgba(14,8,28,.85));border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden}
+.card.hl{box-shadow:var(--glow);border-color:var(--line2)}
+.card h3{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.card h3 .pill{margin-left:auto}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.kpi .l{color:var(--t3);font-size:12px}.kpi .s{font-size:12px;color:var(--v3);margin-top:6px}
+.kpi:after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.25),transparent 70%)}
+.sec-t{display:flex;align-items:end;gap:12px;margin:6px 0 16px}.sec-t h2{margin:0;font-size:22px;letter-spacing:-.02em}.sec-t p{margin:0;color:var(--t3)}
+.muted{color:var(--t3)}.small{font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{padding:3px 9px;border-radius:8px;background:rgba(124,58,237,.12);border:1px solid var(--line);color:var(--v4);font-size:12px}
+.chip.g{background:rgba(52,211,153,.08);color:#a7f3d0;border-color:rgba(52,211,153,.25)}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--t3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid rgba(167,139,250,.08);vertical-align:top}tr:hover td{background:rgba(124,58,237,.05)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:9px 16px;font-weight:650;cursor:pointer;font-size:13px;color:#fff;background:linear-gradient(135deg,#7c3aed,#9f67ff);box-shadow:0 6px 22px -8px rgba(124,58,237,.9);transition:.15s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}.btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--v4);box-shadow:none}.btn.sm{padding:6px 11px;font-size:12px}
+.btn.okb{background:linear-gradient(135deg,#059669,#34d399)}.btn.no{background:transparent;border:1px solid rgba(248,113,113,.4);color:#fca5a5;box-shadow:none}
+.chat{display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 150px)}
+.thread{display:flex;flex-direction:column;min-height:0}.msgs{flex:1;overflow:auto;padding:6px 4px 16px;display:flex;flex-direction:column;gap:14px}
+.m{max-width:78%;padding:13px 16px;border-radius:16px;white-space:pre-wrap;line-height:1.55}
+.m.u{align-self:flex-end;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border-bottom-right-radius:4px;box-shadow:0 8px 26px -12px rgba(124,58,237,.9)}
+.m.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:11px;color:var(--t3)}
+.composer{display:flex;gap:10px;padding:12px;border:1px solid var(--line2);border-radius:16px;background:var(--panel);box-shadow:var(--glow)}
+.composer textarea{flex:1;background:transparent;border:0;color:var(--t);font:inherit;resize:none;outline:none;min-height:44px}
+.sugg{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.sugg span{cursor:pointer;padding:6px 11px;border-radius:999px;border:1px solid var(--line2);color:var(--v4);font-size:12px;background:rgba(124,58,237,.07)}
+.sugg span:hover{background:rgba(124,58,237,.2)}
+.agent{display:flex;flex-direction:column;gap:10px}.agent .hd{display:flex;align-items:center;gap:10px}
+.av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:13px;background:linear-gradient(135deg,rgba(124,58,237,.5),rgba(167,139,250,.25));border:1px solid var(--line2)}
+.agent .nm{font-weight:650}.agent .ms{color:var(--t2);font-size:13px;min-height:40px}
+.steps{display:flex;flex-direction:column;gap:2px}.step{display:grid;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px dashed rgba(167,139,250,.1);font-size:12.5px}
+.step i{width:10px;height:10px;border-radius:50%;background:var(--v2);box-shadow:0 0 10px var(--v2)}
+.act{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:start}
+.act .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(124,58,237,.16);border:1px solid var(--line2);font-size:20px}
+.act pre{white-space:pre-wrap;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0 0;color:var(--t2);font:12.5px/1.5 ui-monospace,Menlo,monospace}
+.doc{display:flex;align-items:center;gap:14px}.doc .ft{width:46px;height:54px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:11px;letter-spacing:.05em}
+.ft.docx{background:linear-gradient(135deg,#3b2a8f,#6d5dfc)}.ft.xlsx{background:linear-gradient(135deg,#155e48,#22c55e)}.ft.pptx{background:linear-gradient(135deg,#8a2c0d,#f97316)}.ft.pdf{background:linear-gradient(135deg,#7f1d1d,#ef4444)}
+.drop{border:1.5px dashed var(--line2);border-radius:16px;padding:26px;text-align:center;color:var(--t2);background:rgba(124,58,237,.05);cursor:pointer}
+.drop:hover{background:rgba(124,58,237,.12)}
+.plan{text-align:center}.plan .p{font-size:30px;font-weight:800;margin:6px 0}.plan.cur{box-shadow:var(--glow);border-color:var(--v2)}
+.login{max-width:420px;margin:12vh auto;text-align:center}.login input{width:100%;padding:12px 14px;margin:6px 0;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--t);font:inherit}
+.toast{position:fixed;right:24px;bottom:24px;background:var(--panel2);border:1px solid var(--line2);box-shadow:var(--glow);padding:12px 16px;border-radius:12px;display:none;z-index:9}
+svg text{fill:var(--t3);font-size:10px}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--t3);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+@media (max-width:1100px){.g6{grid-template-columns:repeat(3,1fr)}.g3,.g4{grid-template-columns:1fr 1fr}.g2,.g22,.chat{grid-template-columns:1fr}}
+
+.nba{margin:0 0 18px}.nba-row{display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px solid rgba(167,139,250,.1)}.nba-row:last-child{border-bottom:0}
+.nba-n{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#7c3aed,#9f67ff);font-weight:800;font-size:12px;box-shadow:var(--glow)}
+.pal{display:none;position:fixed;inset:0;background:rgba(4,2,10,.72);backdrop-filter:blur(10px);z-index:20;place-items:start center;padding-top:12vh}
+.pal.on{display:grid}
+.pal .box{width:min(680px,92vw);background:linear-gradient(180deg,rgba(22,13,44,.98),rgba(14,8,28,.98));border:1px solid var(--line2);border-radius:18px;box-shadow:var(--glow);overflow:hidden}
+.pal input{width:100%;padding:16px 18px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--t);font:inherit;outline:none}
+.pal .hit{padding:12px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;cursor:pointer;border-bottom:1px solid rgba(167,139,250,.08);align-items:start}
+.pal .hit.on,.pal .hit:hover{background:rgba(124,58,237,.16)}
+.hintk{font-size:11px;color:var(--t3);border:1px solid var(--line);border-radius:8px;padding:3px 8px;letter-spacing:.04em}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="pal" id="pal" onclick="if(event.target===this)closePal()">
+  <div class="box" role="dialog" aria-label="Prochaines actions">
+    <input id="palq" placeholder="Que voulez-vous faire ?  (↑↓ Entrée pour activer, Échap pour fermer)" oninput="filterPal()" onkeydown="navPal(event)">
+    <div id="palhits"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const Q=new URLSearchParams(location.search);
+/* démo publique : pas de jeton en query */
+const S={t:localStorage.getItem("exior_t"),k:localStorage.getItem("exior_k"),d:null,view:(location.hash.slice(2)||"tableau")};
+const $=s=>document.querySelector(s);
+const fmt=(v,d=0)=>v==null?"—":Number(v).toLocaleString("fr-FR",{maximumFractionDigits:d,minimumFractionDigits:d});
+const eur=v=>v==null?"—":fmt(v)+" €"; const eurc=v=>v==null?"—":Math.abs(v)>=1e6?fmt(v/1e6,2)+" M€":Math.abs(v)>=1e5?fmt(v/1e3,0)+" k€":eur(v); const pct=v=>v==null?"—":fmt(v*100,1)+" %";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const lab=id=>id.replace(/^agent_/,"").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",3200)}
+
+/* Démo statique : aucune requête réseau, aucun jeton, aucun modèle IA en direct. */
+const DEMO = {"tenant": {"id": "demo", "raison_sociale": "Maison Brume (entreprise fictive)", "plan": "pilotage", "statut": "actif"}, "jumeau": {"Campagne": 4, "Commande": 360, "EcritureComptable": 130, "Facture": 60, "Produit": 20}, "kpis": {"produits": 4222673.27, "charges": 3696337.42, "resultat": 526335.85, "taux_marge_nette": 0.12, "encours_total": 110503.77, "echu_plus_60j": 86899.73, "nb_clients": 9, "part_top1": 0.42}, "prevision_ventes": {"indicateur": "ventes", "mois_historique": 30, "dernier_mois": "2026-10", "derniere_valeur": 65610.84, "modele": "Holt-Winters additif", "params": {"alpha": 0.01, "beta": 0.01, "gamma": 0.91}, "prevision": [95448.28, 112160.3, 60226.11, 72952.13, 68521.54, 70977.83], "ic80": [[90845.63, 100050.93], [105651.18, 118669.42], [52254.09, 68198.13], [63746.84, 82157.42], [58229.71, 78813.37], [59703.7, 82251.96]]}, "historique_ventes": [61984.07999999999, 61047.48, 88741.79999999999, 106203.84000000003, 54113.75999999998, 67341.84, 61541.87999999998, 64493.16, 66762.24000000002, 67481.75999999998, 53227.55999999999, 51651.35999999999, 66467.39999999998, 65610.84], "encours": {"au": "2026-11-22", "encours_total": 110503.77, "part_facture_impayee": 0.38, "balance_agee": {"non_echu": 0.0, "0_30": 8864.42, "31_60": 14739.62, "61_90": 5058.41, "plus_90": 81841.32}, "echu_plus_60j": 86899.73, "top_debiteurs": [{"client": "Client fictif A", "montant": 50591.62}, {"client": "Client fictif B", "montant": 19500.48}, {"client": "Client fictif I", "montant": 17330.79}, {"client": "Client fictif E", "montant": 7872.06}, {"client": "Client fictif H", "montant": 7333.43}], "relances_a_preparer": 5}, "budget_pub": {"budget": 11500.0, "repartition_actuelle": {"google_ads": 4200.0, "meta_ads": 5200.0, "email": 600.0, "tiktok_ads": 1500.0}, "revenu_actuel": 36700.0, "allocation_optimale": {"google_ads": 5750.0, "meta_ads": 3450.0, "email": 2012.5, "tiktok_ads": 287.5}, "revenu_attendu": 41417.76, "gain_estime": 4717.76, "controle_slsqp_ecart_pct": 0.022, "solveur": "HiGHS (LP par morceaux) + contrôle SciPy SLSQP", "hypothese": "saturation b = 1.5 × dépense actuelle par canal (à recalibrer avec l'historique)"}, "concentration": {"nb_clients": 9, "part_top1": 0.42, "part_top5": 0.85, "indice_herfindahl": 0.24, "alerte": "dépendance forte"}, "stocks": {"references": 20, "sous_seuil": 5, "detail": [{"sku": "SKU-000", "qte": 0.0, "seuil": 30.0}, {"sku": "SKU-004", "qte": 8.0, "seuil": 30.0}, {"sku": "SKU-008", "qte": 16.0, "seuil": 30.0}, {"sku": "SKU-012", "qte": 24.0, "seuil": 30.0}, {"sku": "SKU-019", "qte": 3.0, "seuil": 30.0}]}, "agents": [{"id": "orchestrateur", "mission": "Reçoit les demandes du dirigeant, délègue aux spécialistes, consolide", "statut": "actif", "objets_lecture": ["*"], "brouillons": false, "habilitation_pii": true, "expertise": null, "connecteurs": ["fichiers", "gmail", "google_ads", "klaviyo", "meta_ads", "navigateur_logisticien_3pl_maison", "pennylane", "shopify", "stripe"]}, {"id": "reviseur", "mission": "Contrôle chaque chiffre contre les sorties des moteurs ; bloque ou fait corriger", "statut": "actif", "objets_lecture": ["ResultatMoteur"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": []}, {"id": "agent_finance", "mission": "Analyse financière, trésorerie, encours clients, scénarios Monte Carlo", "statut": "actif", "objets_lecture": ["EcritureComptable", "Facture", "TransactionBancaire"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 6, "cache": true}, "connecteurs": ["fichiers", "pennylane", "stripe"]}, {"id": "agent_strategie", "mission": "Initiatives, portefeuille optimal, architecture cible", "statut": "actif", "objets_lecture": ["ResultatMoteur", "EcritureComptable", "Facture"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": ["fichiers", "pennylane", "stripe"]}, {"id": "agent_cyber", "mission": "Socle de sécurité, droits, alertes CERT-FR", "statut": "actif", "objets_lecture": ["Configuration"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 1, "cache": true}, "connecteurs": []}, {"id": "agent_veille", "mission": "Veille macro, sectorielle, réglementaire, tech (sources officielles)", "statut": "actif", "objets_lecture": ["SourceExterne"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": []}, {"id": "agent_secretariat", "mission": "Tri des mails et documents, brouillons de réponse", "statut": "actif", "objets_lecture": ["Mail", "Document"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["gmail", "navigateur_logisticien_3pl_maison"]}, {"id": "agent_recouvrement", "mission": "Relances d'impayés (brouillons), DSO", "statut": "actif", "objets_lecture": ["Facture", "Client", "TransactionBancaire"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 6, "cache": true}, "connecteurs": ["fichiers", "klaviyo", "pennylane", "shopify", "stripe"]}, {"id": "agent_acquisition", "mission": "Allocation du budget publicitaire, attribution", "statut": "actif", "objets_lecture": ["Campagne"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["google_ads", "klaviyo", "meta_ads"]}, {"id": "agent_crm", "mission": "Emailing, tests A/B bayésiens, réachat", "statut": "actif", "objets_lecture": ["Client", "Campagne"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["fichiers", "google_ads", "klaviyo", "meta_ads", "shopify", "stripe"]}, {"id": "agent_supply", "mission": "Prévision de ventes, anti-rupture, réappro", "statut": "actif", "objets_lecture": ["Produit", "Stock", "Commande"], "brouillons": true, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 3, "cache": true}, "connecteurs": ["fichiers", "shopify"]}, {"id": "agent_service_client", "mission": "Tri des demandes clients, brouillons de réponse", "statut": "actif", "objets_lecture": ["Mail", "Commande", "Client"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 1, "cache": true}, "connecteurs": ["fichiers", "gmail", "klaviyo", "shopify", "stripe"]}], "initiatives": [{"id": "I-PUB", "titre": "Réallouer le budget publicitaire à budget constant (HiGHS)", "domaine": "marketing", "gain_annuel_brut": 22645.25, "probabilite_succes": 0.65, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.25, "valeur_esperee": 14719.41, "valeur_ajustee_risque": 11039.56, "agents": ["agent_acquisition"], "connecteurs": ["google_ads", "meta_ads"], "base_calcul": "gain de revenu modélisé 4717.76 €/période × 12 × marge 40 % (hyp.)"}, {"id": "I-MAIL", "titre": "Tri des mails et brouillons de réponse automatiques", "domaine": "automatisation", "gain_annuel_brut": 8930.0, "probabilite_succes": 0.85, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.1, "valeur_esperee": 7590.5, "valeur_ajustee_risque": 6831.45, "agents": ["agent_secretariat"], "connecteurs": ["gmail", "outlook"], "base_calcul": "5 h/semaine économisées (hyp.) × 47 sem × 38 €/h"}, {"id": "I-CYB", "titre": "Socle cyber : MFA, sauvegardes testées, alertes CERT-FR", "domaine": "cyber", "gain_annuel_brut": 3000.0, "probabilite_succes": 0.9, "cout_cash": 0, "charge_jours_agent": 0.5, "risque": 0.05, "valeur_esperee": 2700.0, "valeur_ajustee_risque": 2565.0, "agents": ["agent_cyber"], "connecteurs": [], "base_calcul": "réduction de 2 % d'un risque d'incident à 150 000 € (hyp.)"}, {"id": "I-REC", "titre": "Relances d'impayés préparées automatiquement (brouillons validés en un clic)", "domaine": "tresorerie", "gain_annuel_brut": 3306.75, "probabilite_succes": 0.8, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.1, "valeur_esperee": 2645.4, "valeur_ajustee_risque": 2380.86, "agents": ["agent_recouvrement"], "connecteurs": ["fichiers", "gmail"], "base_calcul": "échu > 60 j 86899.73 € × 0.35 recouvré × coût du financement + 1 h/sem économisée"}, {"id": "I-STK", "titre": "Réapprovisionnement anti-rupture (brouillons de commandes)", "domaine": "operations", "gain_annuel_brut": 3000.0, "probabilite_succes": 0.7, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.2, "valeur_esperee": 2100.0, "valeur_ajustee_risque": 1680.0, "agents": ["agent_supply"], "connecteurs": ["shopify", "fichiers"], "base_calcul": "5 références sous seuil × 600 € de marge préservée/an (hyp.)"}, {"id": "I-DIV", "titre": "Plan de diversification commerciale (dépendance au 1er client)", "domaine": "strategie", "gain_annuel_brut": 5000.0, "probabilite_succes": 0.4, "cout_cash": 0, "charge_jours_agent": 3, "risque": 0.4, "valeur_esperee": 2000.0, "valeur_ajustee_risque": 1200.0, "agents": ["agent_commercial", "agent_strategie"], "connecteurs": ["hubspot"], "base_calcul": "part du 1er client 0.42 ; valeur = réduction de risque (hyp. 5 000 €/an)"}], "portefeuille": {"statut": "OPTIMAL", "solveur": "OR-Tools CP-SAT", "selection": ["I-REC", "I-PUB", "I-STK", "I-MAIL", "I-CYB"], "valeur_totale": 24496.87, "cout_total": 0.0}, "architecture": {"connecteurs_a_ajouter": ["outlook"], "agents_mobilises": ["agent_acquisition", "agent_cyber", "agent_recouvrement", "agent_secretariat", "agent_supply"], "agents_a_creer": []}, "hypotheses": {"cout_horaire_charge_eur": 38.0, "semaines_an": 47, "taux_recouvrement_relance": 0.35, "taux_cout_financement": 0.05, "note": "Hypothèses standard, affichées au dirigeant, recalibrées automatiquement au 1er mois sur ses données."}, "actions": [{"id": 1, "ts": 1795323770.0639246, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif A", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 50591.62, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 50 591,62 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 2, "ts": 1795323770.0647237, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif B", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 19500.48, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 19 500,48 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 3, "ts": 1795323770.0650873, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif I", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 17330.79, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 17 330,79 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 4, "ts": 1795323770.0737536, "acteur": "agent_acquisition", "action": "reallocation_budget_pub", "cible": "google_ads, meta_ads, email, tiktok_ads", "apres": "{\"actuel\": {\"google_ads\": 4200.0, \"meta_ads\": 5200.0, \"email\": 600.0, \"tiktok_ads\": 1500.0}, \"propose\": {\"google_ads\": 5750.0, \"meta_ads\": 3450.0, \"email\": 2012.5, \"tiktok_ads\": 287.5}, \"gain_estime\": 4717.76}", "statut": "a_valider"}, {"id": 5, "ts": 1795323770.074476, "acteur": "agent_supply", "action": "brouillon_reappro", "cible": "5 références", "apres": "{\"references\": [\"SKU-000\", \"SKU-004\", \"SKU-008\", \"SKU-012\", \"SKU-019\"]}", "statut": "a_valider"}], "documents": [{"nom": "plan_initiatives.xlsx", "taille_ko": 7.9, "type": "xlsx"}, {"nom": "presentation.pdf", "taille_ko": 30.9, "type": "pdf"}, {"nom": "presentation.pptx", "taille_ko": 36.5, "type": "pptx"}, {"nom": "rapport_strategique.docx", "taille_ko": 36.9, "type": "docx"}, {"nom": "rapport_strategique.pdf", "taille_ko": 60.7, "type": "pdf"}], "connecteurs": [{"id": "fichiers", "categorie": "import de fichiers", "auth": "fichier", "connecte": true, "outils": ["importer_fichier"], "objets": ["EcritureComptable", "Facture", "Client", "Commande", "Produit", "Stock", "TransactionBancaire"], "serveur_mcp": null}, {"id": "gmail", "categorie": "messagerie", "auth": "oauth2", "connecte": false, "outils": ["list_threads", "create_draft"], "objets": ["Mail", "Document"], "serveur_mcp": null}, {"id": "google_ads", "categorie": "publicité", "auth": "oauth2", "connecte": false, "outils": ["search_stream", "update_budget"], "objets": ["Campagne"], "serveur_mcp": null}, {"id": "klaviyo", "categorie": "emailing", "auth": "api_key", "connecte": false, "outils": ["campaign_metrics", "create_campaign_draft"], "objets": ["Campagne", "Client"], "serveur_mcp": null}, {"id": "meta_ads", "categorie": "publicité", "auth": "oauth2", "connecte": false, "outils": ["ads_insights", "update_budget"], "objets": ["Campagne"], "serveur_mcp": null}, {"id": "navigateur_logisticien_3pl_maison", "categorie": "inconnu — lecture via navigateur, à valider", "auth": "navigateur", "connecte": false, "outils": ["browse_read"], "objets": ["Document"], "serveur_mcp": null}, {"id": "pennylane", "categorie": "comptabilité", "auth": "oauth2", "connecte": false, "outils": ["grand_livre", "factures"], "objets": ["EcritureComptable", "Facture", "Fournisseur"], "serveur_mcp": null}, {"id": "shopify", "categorie": "e-commerce", "auth": "oauth2", "connecte": false, "outils": ["list_orders", "get_products", "update_inventory"], "objets": ["Commande", "Produit", "Client", "Stock"], "serveur_mcp": "Shopify Dev MCP"}, {"id": "stripe", "categorie": "paiements", "auth": "api_key", "connecte": false, "outils": ["list_charges", "list_invoices"], "objets": ["Facture", "Client"], "serveur_mcp": "Stripe MCP (officiel)"}], "usage": {"mois": "2026-11", "taches": 4, "incluses": 1200, "supplementaires": 0, "a_facturer_sup_eur": 0.0, "cout_ia_usd": 0.00909}, "plans": {"essentiel": {"prix_mois_eur": 590, "taches_incluses": 400}, "pilotage": {"prix_mois_eur": 1490, "taches_incluses": 1200}, "direction": {"prix_mois_eur": 3490, "taches_incluses": 3500}}, "genesis": {"famille": "commerce_ecommerce", "methode_secteur": "NAF 47.91B", "duree_totale_s": 1.214, "cout_total_usd": 0.013606, "appels_llm": 19, "politiques": {"regles": 29, "tests": "98/98"}, "passerelle": "48/48", "red_team": {"attaques": 10, "defenses_reussies": 10, "tentatives_interdites_du_modele": 4, "interdits_executes": 0}, "moteurs": "7/7 (7 avec données)", "agents_actifs": 12, "agents_bloques": [], "bibliotheque": {"publies": 21, "refuses_anonymisation": 0}, "etapes": [{"etape": "1. détection des outils (catalogue + bibliothèque)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "2. famille sectorielle (NAF)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "3. coffre à secrets chiffré", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "4. manifestes MCP des connecteurs", "duree_s": 0.001, "cout_usd": 0.0}, {"etape": "5. jumeau numérique (objets importés)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "6. roster d'agents (noyau + pack sectoriel)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "7a. expertise (NAF, ROME, réglementation, docs) + vérification des citations", "duree_s": 0.007, "cout_usd": 0.0}, {"etape": "7b. prompts sur mesure (bibliothèque puis modèle économique)", "duree_s": 0.007, "cout_usd": 0.0}, {"etape": "8. politiques Cedar (refus par défaut)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "9. tests automatiques des politiques", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "9b. harness + sandbox + tests fonctionnels des moteurs", "duree_s": 0.07, "cout_usd": 0.0}, {"etape": "9c. passerelle : actions interdites forcées (modèle supposé compromis)", "duree_s": 0.003, "cout_usd": 0.0}, {"etape": "9d. red team automatique", "duree_s": 0.007, "cout_usd": 0.012511}, {"etape": "9e. porte d'activation", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "10. veille (sources officielles live)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "11. calculs initiaux (moteurs déterministes)", "duree_s": 0.003, "cout_usd": 0.0}, {"etape": "12. mémoire initialisée (+ skills éprouvés de la bibliothèque)", "duree_s": 0.001, "cout_usd": 0.0}, {"etape": "13. initiatives + portefeuille optimal (CP-SAT)", "duree_s": 0.004, "cout_usd": 0.0}, {"etape": "14. synthèse stratégique (squelette déterministe + reformulation revue)", "duree_s": 0.001, "cout_usd": 0.001095}, {"etape": "15. suite bureautique (docx, xlsx, pptx, PDF)", "duree_s": 1.073, "cout_usd": 0.0}, {"etape": "16. publication anonymisée dans la bibliothèque partagée (flywheel)", "duree_s": 0.017, "cout_usd": 0.0}], "veille": []}, "synthese": "Maison Brume (entreprise fictive) — premiers constats du Meta OS (chiffres calculés par les moteurs).\nActivité : 4 222 673 € de produits pour un résultat de 526 336 € (marge nette 12 %).\nTrésorerie immobilisée : 110 504 € d'encours clients, dont 86 900 € échus depuis plus de 60 jours.\nDépendance : le premier client représente 42 % du chiffre d'affaires (9 clients).\nPortefeuille recommandé (5 initiatives) : 24 497 € par an, ajustés du risque.\n- Réallouer le budget publicitaire à budget constant (HiGHS) : 11 040 € par an\n- Tri des mails et brouillons de réponse automatiques : 6 831 € par an\n- Socle cyber : MFA, sauvegardes testées, alertes CERT-FR : 2 565 € par an\n- Relances d'impayés préparées automatiquement (brouillons validés en un clic) : 2 381 € par an\n- Réapprovisionnement anti-rupture (brouillons de commandes) : 1 680 € par an\nLes actions engageantes sont prêtes sous forme de brouillons à valider.", "conversations": [{"ts": 1795323770.0377905, "agent": "agent", "tache": "Quel est notre encours clients et qui relancer en priorité ?", "resultat": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "ok": 1, "cout": 0.0030600000000000002, "modele": "x-ai/grok-4.3", "skill": null}, {"ts": 1795323770.0493996, "agent": "agent", "tache": "Comment répartir le budget publicitaire entre les canaux ?", "resultat": "À budget constant (11 500 €), la répartition optimale (HiGHS) est : google ads 4 200 € → 5 750 € ; meta ads 5 200 € → 3 450 € ; email 600 € → 2 012 € ; tiktok ads 1 500 € → 288 €. Revenu attendu 41 418 € contre 36 700 € aujourd'hui, soit +4 718 € par période.", "ok": 1, "cout": 0.0030837499999999997, "modele": "x-ai/grok-4.3", "skill": null}, {"ts": 1795323770.058016, "agent": "agent", "tache": "Quelle est la prévision des ventes pour les prochains mois ?", "resultat": "Prévision (Holt-Winters additif, 30 mois d'historique) : 95 448 € le mois prochain (intervalle 80 % : 90 846 € à 100 051 €), puis 112 160 €, 60 226 €.", "ok": 1, "cout": 0.0029474999999999996, "modele": "x-ai/grok-4.3", "skill": null}, {"ts": 1795323770.0610955, "agent": "agent", "tache": "Quel est notre encours clients et qui relancer en priorité ?", "resultat": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "ok": 1, "cout": 0.0, "modele": "déterministe (skill rejoué)", "skill": "skill_e2ade25830"}], "audit": {"ok": true, "entrees": 57}, "bibliotheque": {"elements": {"connecteur": 8, "expertise": 8, "pack": 1, "politiques": 1, "prompt": 12}, "reutilisations": 21, "economie_ia_usd": 0.0416}, "copilote": {"famille": "commerce_ecommerce", "genere_en": "deterministe", "appels_llm": 0, "actions": [{"id": "732de53231ce", "kind": "valider", "cible": "1", "titre": "Valider la relance — Client fictif A", "pourquoi": "Impact chiffré : 50 592 € à relancer.", "valeur_attendue_eur": 50591.62, "score": 101183.24, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 1, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "0485b3467810", "kind": "valider", "cible": "2", "titre": "Valider la relance — Client fictif B", "pourquoi": "Impact chiffré : 19 500 € à relancer.", "valeur_attendue_eur": 19500.48, "score": 39000.96, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 2, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "561358796c28", "kind": "valider", "cible": "3", "titre": "Valider la relance — Client fictif I", "pourquoi": "Impact chiffré : 17 331 € à relancer.", "valeur_attendue_eur": 17330.79, "score": 34661.58, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 3, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "4b631725920c", "kind": "connecter", "cible": "meta_ads", "titre": "Connecter Meta Ads", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 11 040 € / an.", "valeur_attendue_eur": 11039.56, "score": 16007.362, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "meta_ads", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "dfe7eaf28024", "kind": "connecter", "cible": "google_ads", "titre": "Connecter Google Ads", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 11 040 € / an.", "valeur_attendue_eur": 11039.56, "score": 16007.362, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "google_ads", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "6df71efc5866", "kind": "connecter", "cible": "gmail", "titre": "Connecter Gmail", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 9 212 € / an.", "valeur_attendue_eur": 9212.31, "score": 13357.8495, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "gmail", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "046d8d746e36", "kind": "importer", "cible": "import:TransactionBancaire", "titre": "Importer un relevé bancaire ou connecter la banque", "pourquoi": "Sans les mouvements bancaires, la prévision de trésorerie ne peut pas tourner.", "valeur_attendue_eur": 7000, "score": 11200.0, "priorite": "lacune", "verbe": "Activer", "deblocage": {"objet": "TransactionBancaire", "type_attendu": "TransactionBancaire"}, "reporté": false, "preuve_similaire": 0}, {"id": "0ad354060d9a", "kind": "connecter", "cible": "outlook", "titre": "Connecter Outlook", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 6 831 € / an.", "valeur_attendue_eur": 6831.45, "score": 9905.6025, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "outlook", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}], "total": 17, "message": "Voici ce que je ferais en premier — classé depuis votre jumeau, sans appel IA."}};
+const QA = [{"keys": ["encours", "relanc", "impaye", "creance", "priorite", "debiteur"], "reponse": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "outils": ["encours_clients"], "skill": null, "modele": "x-ai/grok-4.3"}, {"keys": ["budget", "publicit", "pub ", "canal", "canaux", "acquisition", "repartir", "répartir"], "reponse": "À budget constant (11 500 €), la répartition optimale (HiGHS) est : google ads 4 200 € → 5 750 € ; meta ads 5 200 € → 3 450 € ; email 600 € → 2 012 € ; tiktok ads 1 500 € → 288 €. Revenu attendu 41 418 € contre 36 700 € aujourd'hui, soit +4 718 € par période.", "outils": ["allocation_budget"], "skill": null, "modele": "x-ai/grok-4.3"}, {"keys": ["prevision", "prévision", "ventes", "prochains mois", "holt"], "reponse": "Prévision (Holt-Winters additif, 30 mois d'historique) : 95 448 € le mois prochain (intervalle 80 % : 90 846 € à 100 051 €), puis 112 160 €, 60 226 €, 72 952 €.", "outils": ["prevision"], "skill": null, "modele": "x-ai/grok-4.3"}, {"keys": ["tresorerie", "trésorerie", "banque", "cash"], "reponse": "Il me manque les mouvements bancaires pour prévoir la trésorerie (0 mois disponibles, 6 minimum). Le copilote vous propose d'importer un relevé ou de connecter la banque.", "outils": ["prevision"], "skill": null, "modele": "déterministe (démo)"}, {"keys": ["rupture", "stock", "reappro", "réappro", "produits risquent"], "reponse": "5 références sur 20 sont sous le seuil : SKU-000 (0/30), SKU-004 (8/30), SKU-008 (16/30), SKU-012 (24/30), SKU-019 (3/30). Brouillon de réapprovisionnement prêt.", "outils": ["stocks_a_risque"], "skill": null, "modele": "x-ai/grok-4.3"}, {"keys": ["risque", "perte", "monte carlo", "resultat", "résultat"], "reponse": "Simulation Monte Carlo du résultat (20 000 tirages, hypothèse prudente : charges fixes) : médiane 523 495 €, intervalle 5–95 % de −179 162 € à 1 246 798 €. Probabilité de perte : 11 %.", "outils": ["risque_resultat"], "skill": null, "modele": "x-ai/grok-4.3"}];
+const LS = "exior_demo_etat_v1";
+const DOCS = {
+  "rapport_strategique.docx":"docs/rapport.html","rapport_strategique.pdf":"docs/rapport.html",
+  "plan_initiatives.xlsx":"docs/plan.html","presentation.pptx":"docs/presentation.html","presentation.pdf":"docs/presentation.html"
+};
+function etat(){try{return JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){return {}}}
+function sauver(e){localStorage.setItem(LS, JSON.stringify(e))}
+function normq(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g," ")}
+function matchQA(q){
+  const n=normq(q); let best=null, sc=0;
+  for(const a of QA){const k=a.keys.filter(x=>n.includes(normq(x))).length; if(k>sc){sc=k;best=a}}
+  if(sc>=1) return {...best, revue:{ok:true}, escalade:false, cout_usd:0, skill:best.skill};
+  return {reponse:"Dans cette démo, les réponses sont celles déjà vérifiées par les moteurs sur l'entreprise fictive. Essayez l'une des questions proposées sous le champ.", revue:{ok:true}, modele:"déterministe (démo)", outils:[], skill:null, escalade:false, cout_usd:0};
+}
+function appliquer(){
+  const e=etat(); const d=structuredClone(DEMO);
+  if(e.actions){const map={}; e.actions.forEach(a=>map[a.id]=a.statut); d.actions=d.actions.map(a=>map[a.id]?{...a,statut:map[a.id]}:a)}
+  if(e.taches) d.usage={...d.usage, taches:e.taches};
+  if(e.conversations) d.conversations=e.conversations;
+  if(e.connectes){d.connecteurs=d.connecteurs.map(c=>e.connectes[c.id]?{...c,connecte:true}:c)}
+  if(e.routine) d.usage={...d.usage};
+  const dec=e.decisions||{};
+  if(d.copilote&&d.copilote.actions){
+    d.copilote.actions=d.copilote.actions.filter(a=>{
+      const v=dec[a.id];
+      if(v==="activee" && a.kind==="valider") return false;
+      if(v==="activee" && (a.kind==="automatiser"||a.kind==="prioriser"||a.kind==="activer_skill")) return false;
+      if(v==="activee" && a.kind==="valider") return false;
+      return true;
+    }).map(a=>{
+      if(dec[a.id]==="plus_tard") return {...a, reporté:true, score:(a.score||1)*0.06};
+      if(dec[a.id]==="activee" && a.kind==="connecter") return {...a, verbe:"Importer un export", pourquoi:a.pourquoi+" Dans la démo, l'import de fichier est le chemin disponible."};
+      return a;
+    }).sort((x,y)=> (y.score||0)-(x.score||0) || x.id.localeCompare(y.id));
+  }
+  d._hist=d.historique_ventes||[];
+  return d;
+}
+async function api(p,o={}){
+  const body=typeof o.body==="string" && o.body ? JSON.parse(o.body) : (o.body||{});
+  const e=etat();
+  if(p.endsWith("/dashboard") || p.endsWith("/copilote") && !p.includes("/activer") && !p.includes("/plus-tard")){
+    const d=appliquer();
+    if(p.endsWith("/copilote")) return d.copilote;
+    return d;
+  }
+  const mCop=p.match(/\/copilote\/([^/]+)\/(activer|plus-tard)/);
+  if(mCop){
+    const [_,id,verb]=mCop;
+    const d=appliquer();
+    const a=(d.copilote.actions||[]).find(x=>x.id===id);
+    e.decisions=e.decisions||{};
+    if(verb==="plus-tard"){ e.decisions[id]="plus_tard"; sauver(e); return {id, statut:"plus_tard", message:"Très bien, je la remettrai plus bas et je vous proposerai autre chose."} }
+    if(!a) return {statut:"inconnue", id};
+    e.decisions[id]="activee";
+    if(a.kind==="valider"){
+      const aid=+(a.deblocage&&a.deblocage.action_id || a.cible);
+      e.actions=e.actions||d.actions.map(x=>({id:x.id,statut:x.statut}));
+      e.actions=e.actions.map(x=>x.id==aid?{...x,statut:"approuvee"}:x);
+      if(!e.actions.some(x=>x.id==aid)) e.actions.push({id:aid,statut:"approuvee"});
+      sauver(e);
+      return {id, kind:a.kind, statut:"validee", action:aid, message:"Validé. Dans l'espace client, l'exécution passe par le connecteur — rien n'est envoyé automatiquement."};
+    }
+    if(a.kind==="connecter"||a.kind==="importer"){
+      sauver(e);
+      return {id, kind:a.kind, statut:"ouvrir_import", message:a.kind==="connecter"?"Démo : la connexion continue sera disponible dans l'espace client. En attendant, déposez un export — ça fonctionne déjà.":"Déposez un FEC, des factures ou un relevé (CSV, XLSX) : dans l'espace client, le jumeau se reconfigure."};
+    }
+    if(a.kind==="prioriser"){ sauver(e); return {id, statut:"priorisee", vue:"initiatives", message:"Initiative placée en tête de suivi."} }
+    if(a.kind==="automatiser"){ e.routine=true; sauver(e); return {id, statut:"routine_activee", message:"Veille quotidienne activée dans cette démo. Aucun envoi automatique."} }
+    if(a.kind==="activer_skill"){ sauver(e); return {id, statut:"skill_active", message:"Skill activé. Il sera rejoué dès la prochaine question correspondante."} }
+    sauver(e); return {id, statut:"ok", message:"C'est noté."};
+  }
+  if(p.includes("/chat") && (o.method||"GET").toUpperCase()==="POST"){
+    const r=matchQA(body.message||"");
+    const d=appliquer();
+    e.taches=(e.taches??d.usage.taches)+1;
+    const conv=(e.conversations||d.conversations).concat([
+      {tache:body.message, resultat:r.reponse, ok:1, modele:r.modele, skill:r.skill, cout:r.cout_usd, ts:Date.now()/1000, agent:"agent"}
+    ]);
+    e.conversations=conv.slice(-30);
+    sauver(e);
+    return {reponse:r.reponse, revue:r.revue, modele:r.modele, escalade:r.escalade, skill:r.skill, outils:r.outils||[], cout_usd:r.cout_usd};
+  }
+  if(/\/actions\/\d+/.test(p) && (o.method||"").toUpperCase()==="POST"){
+    const aid=+(p.match(/\/actions\/(\d+)/)[1]);
+    const d=appliquer();
+    e.actions=e.actions||d.actions.map(x=>({id:x.id,statut:x.statut}));
+    const st=body.approuve?"approuvee":"refusee";
+    e.actions=e.actions.map(x=>x.id==aid?{...x,statut:st}:x);
+    if(!e.actions.some(x=>x.id==aid)) e.actions.push({id:aid,statut:st});
+    e.decisions=e.decisions||{};
+    (d.copilote.actions||[]).forEach(a=>{ if(a.kind==="valider" && String(a.deblocage&&a.deblocage.action_id||a.cible)===String(aid)) e.decisions[a.id]="activee"; });
+    sauver(e);
+    return {action:aid, approuve:!!body.approuve};
+  }
+  throw new Error("inaccessible en démo");
+}
+
+const I={
+ tableau:'<path d="M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z"/>',
+ conversation:'<path d="M4 4h16v12H7l-3 3z"/>',
+ initiatives:'<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>',
+ agents:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>',
+ validations:'<path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="4"/>',
+ documents:'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/>',
+ connecteurs:'<path d="M9 7V3M15 7V3M7 7h10v5a5 5 0 01-10 0zM12 17v4"/>',
+ metasysteme:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/>',
+ reglages:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>'};
+const NAV=[["tableau","Tableau de bord"],["conversation","Conversation"],["initiatives","Initiatives"],["agents","Agents"],["validations","Validations"],["documents","Documents"],["connecteurs","Connecteurs"],["metasysteme","Métasystème"],["reglages","Réglages & offre"]];
+const ico=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
+
+function line(hist,prev,ic){ // SVG ligne historique + prévision + intervalle
+ const W=640,H=210,P=30,all=[...hist,...prev,...ic.flat()],mx=Math.max(...all)*1.05,mn=Math.min(...all)*.9,n=hist.length+prev.length;
+ const x=i=>P+(W-2*P)*i/(n-1),y=v=>H-P-(H-2*P)*(v-mn)/(mx-mn);
+ const hp=hist.map((v,i)=>`${i?"L":"M"}${x(i)},${y(v)}`).join(""),o=hist.length-1;
+ const pp=`M${x(o)},${y(hist[o])}`+prev.map((v,i)=>`L${x(o+1+i)},${y(v)}`).join("");
+ const band=`M${x(o)},${y(hist[o])}`+ic.map((v,i)=>`L${x(o+1+i)},${y(v[1])}`).join("")+ic.map((v,i)=>[i,v]).reverse().map(([i,v])=>`L${x(o+1+i)},${y(v[0])}`).join("")+"Z";
+ let g="";for(let k=0;k<4;k++){const v=mn+(mx-mn)*k/3;g+=`<line x1="${P}" x2="${W-P}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(167,139,250,.08)"/><text x="2" y="${y(v)+3}">${fmt(v/1000)}k</text>`}
+ return `<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="gl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".45"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient></defs>${g}
+ <path d="${hp}L${x(o)},${H-P}L${x(0)},${H-P}Z" fill="url(#gl)"/><path d="${hp}" stroke="#a78bfa" stroke-width="2.2" fill="none"/>
+ <path d="${band}" fill="rgba(196,181,253,.16)"/><path d="${pp}" stroke="#e9d5ff" stroke-width="2.2" stroke-dasharray="5 4" fill="none"/>
+ <circle cx="${x(o)}" cy="${y(hist[o])}" r="4" fill="#fff" stroke="#8b5cf6" stroke-width="2"/></svg>`}
+function bars(items,max){max=max||Math.max(...items.map(i=>Math.max(i.a,i.b||0)))||1;
+ return items.map(i=>`<div style="margin:9px 0"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${esc(i.l)}</span><span class="muted">${i.t}</span></div>
+ <div style="height:8px;border-radius:6px;background:rgba(167,139,250,.1);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:${100*i.a/max}%;background:${i.c||"linear-gradient(90deg,#7c3aed,#a78bfa)"}"></i></div>
+ ${i.b!=null?`<div style="height:8px;border-radius:6px;background:rgba(167,139,250,.06);margin-top:3px;overflow:hidden"><i style="display:block;height:100%;width:${100*i.b/max}%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></i></div>`:""}</div>`).join("")}
+
+const V={
+tableau(d){const k=d.kpis,pv=d.prevision_ventes,e=d.encours,b=d.budget_pub;
+ const hist=Object.values(pv.historique||{}).slice?.(-14)||[];
+ return `${nba(d)}
+ <div class="sec-t"><h2>Bonjour 👋</h2><p>Voici votre entreprise, calculée en continu par vos agents — chaque chiffre vient d'un moteur.</p></div>
+ <div class="grid g6">
+ ${[["Produits (exercice)",eurc(k.produits),"FEC — comptes 7"],["Résultat",eurc(k.resultat),"marge nette "+pct(k.taux_marge_nette)],["Encours clients",eurc(k.encours_total),fmt(e.top_debiteurs?.length)+" débiteurs suivis"],
+   ["Échu > 60 jours",eur(k.echu_plus_60j),"relances prêtes"],["Clients facturés",fmt(k.nb_clients),"1er client : "+pct(k.part_top1)],["Gain pub modélisé",eur(b.gain_estime),"à budget constant"]]
+   .map(([l,v,s])=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("")}
+ </div>
+ <div class="grid g2" style="margin-top:16px">
+  <div class="card hl"><h3>Prévision des ventes <span class="pill">${esc(pv.methode||pv.modele||"")}</span></h3>${pv.prevision?line(d._hist,pv.prevision,pv.intervalle_80||pv.ic80):'<p class="muted">Données insuffisantes</p>'}
+   <div class="legend"><span><i style="background:#a78bfa"></i>Historique</span><span><i style="background:#e9d5ff"></i>Prévision 6 mois</span><span><i style="background:rgba(196,181,253,.3)"></i>Intervalle 80 %</span></div></div>
+  <div class="card"><h3>Synthèse stratégique <span class="pill ok"><span class="dot"></span>Vérifiée</span></h3><div style="white-space:pre-wrap;color:var(--t2);font-size:13px;max-height:250px;overflow:auto">${esc(d.synthese)}</div></div>
+ </div>
+ <div class="grid g3" style="margin-top:16px">
+  <div class="card"><h3>Balance âgée des créances</h3>${bars(Object.entries(e.balance_agee||{}).map(([l,v])=>({l:l.replace("_"," – ").replace("plus – ","> ")+(l=="non_echu"?"":" j"),a:v,t:eur(v),c:l.includes("90")||l.includes("61")?"linear-gradient(90deg,#dc2626,#f87171)":undefined})))}</div>
+  <div class="card"><h3>Budget publicitaire <span class="pill">HiGHS</span></h3>${b.repartition_actuelle?bars(Object.keys(b.repartition_actuelle).map(c=>({l:c.replace("_"," "),a:b.repartition_actuelle[c],b:b.allocation_optimale[c],t:eur(b.repartition_actuelle[c])+" → "+eur(b.allocation_optimale[c])}))):""}
+   <div class="legend"><span><i style="background:#8b5cf6"></i>Actuel</span><span><i style="background:#34d399"></i>Optimal</span></div></div>
+  <div class="card"><h3>Jumeau numérique</h3><div class="chips">${Object.entries(d.jumeau).map(([t,n])=>`<span class="chip">${t} · ${fmt(n)}</span>`).join("")}</div>
+   <h3 style="margin-top:18px">Veille du jour</h3>${(d.genesis.veille||[]).length?(d.genesis.veille||[]).map(v=>`<div class="small" style="margin:6px 0"><b>${esc(v.source)}</b> <span class="muted">${esc((v.derniers_avis||[]).slice(0,1).join("")||v.eur_usd||v.http||"")}</span></div>`).join(""):'<p class="small muted">CERT-FR, BCE et sources sectorielles — relevé quotidien.</p>'}
+   <h3 style="margin-top:18px">Stocks</h3><div class="small">${fmt(d.stocks.sous_seuil)} références sous le seuil sur ${fmt(d.stocks.references)}</div></div>
+ </div>`},
+conversation(d){const c=d.conversations||[];
+ return `<div class="chat"><div class="thread"><div class="msgs" id="msgs">${c.map(e=>`<div class="m u">${esc(e.tache)}</div><div class="m a">${esc(e.resultat)}<div class="meta"><span class="chip ${e.ok?"g":""}">${e.ok?"✓ vérifié par le réviseur":"bloqué par le réviseur"}</span><span class="chip">${esc(e.modele)}</span>${e.skill?`<span class="chip">skill appris</span>`:""}<span>${fmt(e.cout*0.92,4)} €</span></div></div>`).join("")||'<p class="muted">Posez votre première question.</p>'}</div>
+  <div class="sugg">${["Quelle est notre trésorerie prévisionnelle ?","Qui relancer en priorité ?","Où mettre le budget pub ce mois-ci ?","Quels produits risquent la rupture ?","Quel est le risque sur le résultat ?"].map(s=>`<span onclick="ask(this.textContent)">${s}</span>`).join("")}</div>
+  <div class="composer"><textarea id="q" placeholder="Demandez n'importe quoi à votre Meta OS… (Entrée pour envoyer)" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();ask()}"></textarea><button class="btn" onclick="ask()">Envoyer ➤</button></div></div>
+  <div class="card"><h3>Comment je réponds</h3><div class="small muted" style="line-height:1.7">1. Je cherche d'abord un <b style="color:#fff">skill déjà appris</b>.<br>2. Je délègue à l'agent spécialisé.<br>3. Les <b style="color:#fff">moteurs calculent</b> (HiGHS, CP-SAT, bayésien, Monte Carlo, Holt-Winters).<br>4. Le <b style="color:#fff">réviseur</b> vérifie chaque chiffre.<br>5. Modèle économique par défaut, modèle fort seulement si le réviseur le demande.<br>6. Tout engagement reste un <b style="color:#fff">brouillon à valider</b>.</div>
+  <h3 style="margin-top:18px">Ce mois-ci</h3><div class="small">${fmt(d.usage.taches)} tâches sur ${fmt(d.usage.incluses)} incluses</div></div></div>`},
+initiatives(d){const sel=new Set(d.portefeuille.selection||[]);
+ return `<div class="sec-t"><h2>Initiatives</h2><p>Générées depuis votre jumeau, valorisées et sélectionnées par optimisation (OR-Tools CP-SAT).</p></div>
+ <div class="grid g4"><div class="card kpi hl"><div class="l">Valeur du portefeuille retenu</div><div class="v">${eur(d.portefeuille.valeur_totale)}<span class="small muted"> /an</span></div><div class="s">ajustée du risque · ${esc(d.portefeuille.statut||"")}</div></div>
+ <div class="card kpi"><div class="l">Initiatives retenues</div><div class="v">${sel.size} / ${d.initiatives.length}</div><div class="s">budget et capacité respectés</div></div>
+ <div class="card kpi"><div class="l">Connecteurs à ajouter</div><div class="v">${(d.architecture.connecteurs_a_ajouter||[]).length}</div><div class="s">${esc((d.architecture.connecteurs_a_ajouter||[]).join(", "))}</div></div>
+ <div class="card kpi"><div class="l">Agents mobilisés</div><div class="v">${(d.architecture.agents_mobilises||[]).length}</div><div class="s">architecture cible</div></div></div>
+ <div class="card" style="margin-top:16px"><table><tr><th>Initiative</th><th class="num">Gain brut/an</th><th class="num">Probabilité</th><th class="num">Risque</th><th class="num">Valeur ajustée</th><th>Agents</th><th></th></tr>
+ ${d.initiatives.map(i=>`<tr><td><b>${esc(i.titre)}</b><div class="small muted">${esc(i.base_calcul)}</div></td><td class="num">${eur(i.gain_annuel_brut)}</td><td class="num">${pct(i.probabilite_succes)}</td><td class="num">${pct(i.risque)}</td><td class="num"><b>${eur(i.valeur_ajustee_risque)}</b></td><td><div class="chips">${i.agents.map(a=>`<span class="chip">${lab(a)}</span>`).join("")}</div></td><td>${sel.has(i.id)?'<span class="pill ok">Retenue</span>':'<span class="pill">En réserve</span>'}</td></tr>`).join("")}</table>
+ <p class="small muted" style="margin-top:12px">${esc(d.hypotheses.note||"")}</p></div>`},
+agents(d){return `<div class="sec-t"><h2>Vos agents</h2><p>Créés automatiquement pour votre secteur (${esc(d.genesis.famille)} · ${esc(d.genesis.methode_secteur)}), testés et attaqués avant activation.</p></div>
+ <div class="grid g4">${d.agents.map(a=>{const on=a.statut=="actif";return `<div class="card agent ${on?"":""}"><div class="hd"><div class="av">${lab(a.id).slice(0,2).toUpperCase()}</div><div><div class="nm">${lab(a.id)}</div><span class="pill ${on?"ok":"warn"}"><span class="dot"></span>${on?"Actif":"Bloqué par la porte"}</span></div></div>
+ <div class="ms">${esc(a.mission)}</div>
+ <div class="chips">${(a.objets_lecture||[]).slice(0,4).map(o=>`<span class="chip">${o=="*"?"tout (orchestration)":o}</span>`).join("")}</div>
+ <div class="small muted">${a.expertise?`Expertise vérifiée : <b style="color:#fff">${pct(a.expertise.taux_verification)}</b> · ${a.expertise.regles} règles citées${a.expertise.cache?" · bibliothèque":""}`:"Noyau du métasystème"}</div>
+ <div class="small muted">${a.brouillons?"✎ brouillons à valider":"lecture seule"} · ${a.habilitation_pii?"données personnelles habilitées":"sans données personnelles"} · paiement : jamais</div></div>`}).join("")}</div>`},
+validations(d){const P=d.actions.filter(a=>a.statut=="a_valider"),H=d.actions.filter(a=>a.statut!="a_valider");
+ const icn={relance_impaye:"✉️",reallocation_budget_pub:"📊",brouillon_reappro:"📦",brouillon_reponse:"💬"};
+ return `<div class="sec-t"><h2>Validations</h2><p>Rien d'engageant ne part sans vous. Un clic pour valider, un clic pour refuser.</p></div>
+ ${P.map(a=>{const x=JSON.parse(a.apres||"{}");return `<div class="card" style="margin-bottom:12px"><div class="act"><div class="ic">${icn[a.action]||"⚡"}</div>
+ <div><b>${esc(lab(a.action))}</b> <span class="muted">· ${esc(a.cible)}</span><div class="small muted">proposé par ${lab(a.acteur)} · ${new Date(a.ts*1000).toLocaleString("fr-FR")}</div>
+ ${detail(a.action,x)}</div>
+ <div style="display:flex;flex-direction:column;gap:8px"><button class="btn okb sm" onclick="decide(${a.id},true)">✓ Valider</button><button class="btn no sm" onclick="decide(${a.id},false)">Refuser</button></div></div></div>`}).join("")||'<div class="card"><p class="muted">Aucune validation en attente. 🎉</p></div>'}
+ ${H.length?`<h3 class="muted" style="margin-top:22px">Historique</h3><div class="card"><table>${H.map(a=>`<tr><td>${esc(lab(a.action))}</td><td class="muted">${esc(a.cible)}</td><td><span class="pill ${a.statut=="approuvee"?"ok":"bad"}">${a.statut}</span></td></tr>`).join("")}</table></div>`:""}`},
+documents(d){return `<div class="sec-t"><h2>Documents</h2><p>Produits par votre suite bureautique intégrée (Word, Excel avec formules, PowerPoint, PDF).</p></div>
+ <div class="grid g3">${d.documents.map(f=>`<div class="card doc"><div class="ft ${f.type}">${f.type.toUpperCase()}</div><div style="flex:1"><b>${esc(f.nom)}</b><div class="small muted">${fmt(f.taille_ko,1)} Ko</div></div><button class="btn ghost sm" onclick="dl('${esc(f.nom)}')">Télécharger</button></div>`).join("")||'<p class="muted">Aucun document.</p>'}</div>`},
+connecteurs(d){return `<div class="sec-t"><h2>Connecteurs</h2><p>Détectés depuis vos outils. Déposez vos exports pour démarrer tout de suite ; connectez vos comptes pour la synchronisation continue.</p></div>
+ <div class="drop" onclick="document.getElementById('f').click()"><div style="font-size:28px">⇪</div><b>Déposez un FEC, des factures, des ventes (CSV, XLSX)</b><div class="small muted">Reconnu automatiquement et ajouté à votre jumeau — puis vos agents se reconfigurent.</div><input type="file" id="f" style="display:none" onchange="up(this.files[0])"></div>
+ <div class="grid g3" style="margin-top:16px">${d.connecteurs.map(c=>`<div class="card"><h3 style="color:#fff;font-size:14px">${esc(lab(c.id))}<span class="pill ${c.connecte?"ok":""}">${c.connecte?"<span class='dot'></span>Actif":esc(c.auth)}</span></h3>
+ <div class="small muted">${esc(c.categorie)}${c.serveur_mcp?" · serveur MCP : "+esc(c.serveur_mcp):""}</div>
+ <div class="chips" style="margin:10px 0">${c.outils.map(o=>`<span class="chip">${esc(o)}</span>`).join("")}</div>
+ ${c.connecte?"":`<button class="btn sm" onclick="conn('${c.id}')">Connecter</button>`}</div>`).join("")}</div>`},
+metasysteme(d){const g=d.genesis;return `<div class="sec-t"><h2>Métasystème</h2><p>La couche de contrôle qui a créé, testé et activé vos agents — et qui continue de les faire progresser.</p></div>
+ <div class="grid g4">${[["Onboarding complet",fmt(g.duree_totale_s,2)+" s",fmt(g.cout_total_usd*0.92,3)+" € de calcul IA"],["Politiques testées",esc(g.politiques?.tests),"refus par défaut, forbid prioritaire"],["Actions interdites forcées",esc(g.passerelle)+" bloquées","modèle supposé compromis"],["Red team",(g.red_team?.defenses_reussies??"—")+" / "+(g.red_team?.attaques??"—"),(g.red_team?.interdits_executes??0)+" action interdite exécutée"]]
+  .map(([l,v,s])=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("")}</div>
+ <div class="grid g22" style="margin-top:16px"><div class="card"><h3>Genesis — étapes chronométrées</h3><div class="steps">${(g.etapes||[]).map(s=>`<div class="step"><i></i><span>${esc(s.etape)}</span><span class="muted">${fmt(s.duree_s,2)} s</span><span class="muted">${fmt(s.cout_usd*0.92,4)} €</span></div>`).join("")}</div></div>
+ <div class="card hl"><h3>Volant d'inertie (bibliothèque partagée)</h3><p class="small muted">Chaque onboarding publie des modèles anonymisés (jamais de données client) : packs d'expertise, prompts, connecteurs, politiques, skills. L'entreprise suivante démarre plus vite et pour moins cher.</p>
+ <div class="chips">${Object.entries(d.bibliotheque.elements||{}).map(([k,n])=>`<span class="chip">${k} · ${n}</span>`).join("")}</div>
+ <div class="grid g22" style="margin-top:14px"><div class="kpi"><div class="l">Réutilisations</div><div class="v">${fmt(d.bibliotheque.reutilisations)}</div></div><div class="kpi"><div class="l">IA économisée</div><div class="v">${fmt(d.bibliotheque.economie_ia_usd*0.92,3)} €</div></div></div>
+ <h3 style="margin-top:16px">Journal d'audit</h3><span class="pill ${d.audit.ok?"ok":"bad"}"><span class="dot"></span>${d.audit.ok?"Chaîne intègre":"Rupture détectée"} · ${fmt(d.audit.entrees)} entrées</span></div></div>`},
+reglages(d){const cur=d.tenant.plan;return `<div class="sec-t"><h2>Réglages & offre</h2><p>Abonnement + usage. Aucun frais de mise en place.</p></div>
+ <div class="grid g3">${Object.entries(d.plans).map(([k,p])=>`<div class="card plan ${k==cur?"cur":""}"><div class="pill">${k==cur?"Votre offre":"Offre"}</div><h3 style="justify-content:center;color:#fff;font-size:16px;margin-top:10px">${k[0].toUpperCase()+k.slice(1)}</h3><div class="p">${fmt(p.prix_mois_eur)} €<span class="small muted"> HT/mois</span></div><div class="muted small">${fmt(p.taches_incluses)} tâches incluses · 0 € de mise en place</div></div>`).join("")}</div>
+ <div class="grid g22" style="margin-top:16px"><div class="card"><h3>Consommation du mois</h3><div class="kpi"><div class="v">${fmt(d.usage.taches)} <span class="small muted">/ ${fmt(d.usage.incluses)} tâches</span></div></div><div class="meter" style="width:100%;margin-top:10px"><div class="bar"><i style="width:${Math.min(100,100*d.usage.taches/d.usage.incluses)}%"></i></div></div><p class="small muted">Tâche supplémentaire : 0,90 € HT · supplément à ce jour : ${eur(d.usage.a_facturer_sup_eur)}</p></div>
+ <div class="card"><h3>Sécurité</h3><div class="small" style="line-height:1.9">✓ Données, mémoire, coffre et journal isolés pour votre entreprise<br>✓ Secrets chiffrés, jamais visibles des agents<br>✓ Aucun paiement par un agent, jamais<br>✓ Envois et écritures uniquement après votre validation<br>✓ Journal d'audit chaîné et vérifiable</div></div></div>`}
+};
+function detail(t,x){
+ if(x.corps)return `<pre>${x.objet?"Objet : "+esc(x.objet)+"\n\n":""}${esc(x.corps)}</pre>`;
+ if(x.actuel&&x.propose)return `<table style="margin-top:10px;max-width:560px"><tr><th>Canal</th><th class="num">Actuel</th><th class="num">Proposé</th><th class="num">Écart</th></tr>${Object.keys(x.actuel).map(c=>`<tr><td>${esc(c.replace("_"," "))}</td><td class="num">${eur(x.actuel[c])}</td><td class="num"><b>${eur(x.propose[c])}</b></td><td class="num" style="color:${x.propose[c]>=x.actuel[c]?"var(--ok)":"var(--bad)"}">${x.propose[c]>=x.actuel[c]?"+":""}${eur(x.propose[c]-x.actuel[c])}</td></tr>`).join("")}</table><div class="small muted" style="margin-top:8px">Gain modélisé : <b style="color:#fff">+${eur(x.gain_estime)}</b> par période, à budget constant.</div>`;
+ if(x.references)return `<div class="chips" style="margin-top:10px">${x.references.map(r=>`<span class="chip">${esc(r)}</span>`).join("")}</div>`;
+ return `<pre>${esc(JSON.stringify(x,null,1))}</pre>`}
+
+function nba(d){const L=(d.copilote&&d.copilote.actions)||[];if(!L.length)return "";
+ const rows=L.slice(0,5).map((a,i)=>`<div class="nba-row"><div class="nba-n">${i+1}</div>
+  <div><b>${esc(a.titre)}</b>${a.valeur_attendue_eur?`<span class="pill" style="margin-left:8px">${eurc(a.valeur_attendue_eur)}${a.kind==="valider"?"":" / an"}</span>`:""}${a.preuve_similaire?`<span class="chip" style="margin-left:6px">${a.preuve_similaire} entreprise${a.preuve_similaire>1?"s":""} similaire${a.preuve_similaire>1?"s":""}</span>`:""}
+  <div class="small muted" style="margin-top:4px">${esc(a.pourquoi)}</div></div>
+  <div style="display:flex;flex-direction:column;gap:6px;min-width:118px">
+    <button class="btn sm" onclick="nbaGo('${a.id}',true)">${esc(a.verbe||"Activer")}</button>
+    <button class="btn ghost sm" onclick="nbaGo('${a.id}',false)">Plus tard</button>
+  </div></div>`).join("");
+ return `<div class="card hl nba"><h3>Copilote d'activation <span class="pill ok"><span class="dot"></span>Sans appel IA</span></h3>
+  <p class="small muted" style="margin:-4px 0 8px">${esc((d.copilote&&d.copilote.message)||"Voici ce que je ferais en premier.")}</p>${rows}</div>`}
+async function nbaGo(id,ok){const r=await api(`/tenants/${S.t}/copilote/${id}/${ok?"activer":"plus-tard"}`,{method:"POST",body:"{}"});
+ if(!ok){toast(r.message||"Bien, on verra plus tard.");await load();return}
+ if(r.statut==="redirection"&&r.url){location.href=r.url;return}
+ if(r.statut==="ouvrir_import"||r.statut==="application_oauth_manquante"){toast(r.message||r.repli||"Ouvrez Connecteurs pour déposer un fichier.");go("connecteurs");return}
+ if(r.vue){toast(r.message||"C'est noté.");S.view=r.vue;await load();return}
+ toast(r.message||"C'est fait.");await load()}
+function openPal(){const el=$("#pal");el.classList.add("on");filterPal();const i=$("#palq");if(i){i.value="";i.focus()}PAL.i=0}
+function closePal(){$("#pal")?.classList.remove("on")}
+function palItems(){const q=($("#palq")?.value||"").toLowerCase().trim();const acts=((S.d||{}).copilote||{}).actions||[];
+ const nav=NAV.map(([k,l])=>({kind:"nav",id:k,titre:"Aller à "+l,pourquoi:"Navigation",verbe:"Ouvrir"}));
+ return [...acts,...nav].filter(a=>!q||(a.titre+" "+(a.pourquoi||"")).toLowerCase().includes(q))}
+function filterPal(){const items=palItems();PAL.i=Math.min(PAL.i,Math.max(0,items.length-1));
+ $("#palhits").innerHTML=items.map((a,i)=>`<div class="hit ${i===PAL.i?"on":""}" onmouseenter="PAL.i=${i}" onclick="palRun(${i})">
+  <div><b>${esc(a.titre)}</b><div class="small muted">${esc(a.pourquoi||"")}</div></div>
+  <div>${a.kind==="nav"?`<span class="hintk">↵</span>`:`<span class="btn sm">${esc(a.verbe||"Activer")}</span>`}</div></div>`).join("")||'<div class="hit muted">Aucune action.</div>'}
+function navPal(e){const n=palItems().length;if(e.key==="Escape"){e.preventDefault();closePal()}
+ else if(e.key==="ArrowDown"){e.preventDefault();PAL.i=Math.min(n-1,(PAL.i||0)+1);filterPal()}
+ else if(e.key==="ArrowUp"){e.preventDefault();PAL.i=Math.max(0,(PAL.i||0)-1);filterPal()}
+ else if(e.key==="Enter"){e.preventDefault();palRun(PAL.i||0)}}
+async function palRun(i){const a=palItems()[i];if(!a)return;closePal();if(a.kind==="nav"){go(a.id);return}await nbaGo(a.id,true)}
+const PAL={i:0};
+addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("#pal")?.classList.contains("on")?closePal():openPal()}});
+
+function render(){ if(!S.t||!S.k){$("#root").innerHTML=`<div class="login card hl"><div class="mark" style="margin:0 auto 14px;width:48px;height:48px">E</div><h2>EXIOR Meta OS</h2><p class="muted">Connectez-vous à votre espace</p><input id="lt" placeholder="Identifiant entreprise"><input id="lk" type="password" placeholder="Jeton d'accès"><button class="btn" style="width:100%;justify-content:center;margin-top:8px" onclick="S.t=lt.value;S.k=lk.value;localStorage.setItem('exior_t',S.t);localStorage.setItem('exior_k',S.k);load()">Entrer</button></div>`;return}
+ const d=S.d;if(!d)return; const pend=d.actions.filter(a=>a.statut=="a_valider").length,u=d.usage;
+ $("#root").innerHTML=`<div class="app"><aside><div class="logo"><div class="mark">E</div><div><b>EXIOR</b><small>META OS</small></div></div>
+ ${NAV.map(([k,l])=>`<div class="nav ${S.view==k?"on":""}" onclick="go('${k}')">${ico(k)}<span>${l}</span>${k=="validations"&&pend?`<span class="cnt">${pend}</span>`:""}</div>`).join("")}
+ <div class="side-foot"><b>${d.agents.filter(a=>a.statut=="actif").length} agents actifs</b><br>${fmt(Object.values(d.jumeau).reduce((a,b)=>a+b,0))} objets dans le jumeau<br><span style="color:var(--v3)">Métasystème opérationnel</span><div class="small muted" style="margin-top:8px">Démo — entreprise fictive</div></div></aside>
+ <main><div class="top"><div><h1>${esc(d.tenant.raison_sociale)}</h1><div class="sub">${esc(NAV.find(n=>n[0]==S.view)[1])}</div></div><span class="pill ok"><span class="dot"></span>${d.tenant.statut=="actif"?"Actif":esc(d.tenant.statut)}</span><span class="pill">Offre ${esc(d.tenant.plan)}</span><div class="sp"></div>
+ <div class="meter"><small>${fmt(u.taches)} / ${fmt(u.incluses)} tâches ce mois</small><div class="bar"><i style="width:${Math.min(100,100*u.taches/u.incluses)}%"></i></div></div><button class="btn ghost sm" onclick="openPal()" title="Palette de commandes">⌘K</button><button class="btn sm" onclick="go('conversation')">✦ Demander</button></div>
+ <div class="view">${V[S.view](d)}</div></main></div>`;
+ const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight}
+function go(v){S.view=v;location.hash="#/"+v;render()}
+async function load(){S.d=appliquer(); render(); if(Q.get("palette")==="1")openPal()}
+async function ask(t){const q=t||$("#q").value.trim();if(!q)return;const m=$("#msgs");m.insertAdjacentHTML("beforeend",`<div class="m u">${esc(q)}</div><div class="m a" id="pending">…</div>`);m.scrollTop=m.scrollHeight;if($("#q"))$("#q").value="";
+ try{const r=await api(`/tenants/${S.t}/chat`,{method:"POST",body:JSON.stringify({message:q})});$("#pending").outerHTML=`<div class="m a">${esc(r.reponse)}<div class="meta"><span class="chip ${r.revue.ok?"g":""}">${r.revue.ok?"✓ vérifié par le réviseur":"bloqué par le réviseur"}</span><span class="chip">${esc(r.modele)}</span>${r.escalade?'<span class="chip">escalade</span>':""}${r.skill?'<span class="chip">skill appris</span>':""}${r.outils.map(o=>`<span class="chip">${o}</span>`).join("")}<span>${fmt(r.cout_usd*0.92,4)} €</span></div></div>`;S.d.usage.taches++}catch(e){$("#pending").textContent="Erreur : "+e.message}}
+async function decide(id,ok){await api(`/tenants/${S.t}/actions/${id}`,{method:"POST",body:JSON.stringify({approuve:ok})});toast(ok?"Validé — exécution déclenchée par le connecteur":"Refusé");await load()}
+async function dl(n){const href=DOCS[n]||("docs/"+encodeURIComponent(n)); window.open(href, "_blank", "noopener")}
+async function up(f){if(!f)return;toast("Démo : le fichier « "+f.name+" » serait reconnu et ajouté au jumeau. Dans l'espace client, les agents se reconfigurent ensuite.");}
+async function conn(c){toast("Démo : la connexion continue à "+c.replace(/_/g," ")+" sera disponible dans l'espace client. En attendant, déposez un export — ça fonctionne déjà.")}
+addEventListener("hashchange",()=>{const v=location.hash.slice(2);if(V[v]&&v!=S.view){S.view=v;render()}});
+if(!V[S.view])S.view="tableau"; S.t="demo"; S.k="demo"; load();
+</script>
+</body>
+</html>
