@@ -129,7 +129,7 @@ const S={t:localStorage.getItem("exior_t"),k:localStorage.getItem("exior_k"),d:n
 const $=s=>document.querySelector(s);
 const fmt=(v,d=0)=>v==null?"—":Number(v).toLocaleString("fr-FR",{maximumFractionDigits:d,minimumFractionDigits:d});
 const eur=v=>v==null?"—":fmt(v)+" €"; const eurc=v=>v==null?"—":Math.abs(v)>=1e6?fmt(v/1e6,2)+" M€":Math.abs(v)>=1e5?fmt(v/1e3,0)+" k€":eur(v); const pct=v=>v==null?"—":fmt(v*100,1)+" %";
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">",'"':"""}[c]));
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"\x26amp;","<":"\x26lt;",">":"\x26gt;",'"':"\x26quot;"}[c]));
 const lab=id=>id.replace(/^agent_/,"").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
 function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",3200)}
 
