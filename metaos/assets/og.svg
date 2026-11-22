@@ -11,10 +11,10 @@
   </g>
   <rect x="780" y="70" width="348" height="36" rx="18" fill="#1A1433" stroke="#7C3AED"/>
   <text x="954" y="93" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.4" fill="#DDD6FE">META OS  ·  MÉTASYSTÈME D'ENTREPRISE</text>
-  <text x="72" y="235" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="2.2" fill="#A78BFA">GENESIS  ·  EXPERTISE VÉRIFIÉE  ·  MOTEURS MATHÉMATIQUES</text>
-  <text x="72" y="305" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="48" font-weight="700" fill="#FFFFFF">Votre entreprise se configure,</text>
-  <text x="72" y="365" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="48" font-weight="700" fill="#FFFFFF">s'optimise et se surveille.</text>
-  <text x="72" y="425" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" fill="#C8CAD4">Prototype testé sur données fictives · Sources officielles réelles · 0 € mise en place.</text>
+  <text x="72" y="235" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="2.2" fill="#A78BFA">OPÉRATIONNEL DÈS LA SOUSCRIPTION  ·  0 € MISE EN PLACE</text>
+  <text x="72" y="305" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="48" font-weight="700" fill="#FFFFFF">Votre entreprise pilotée par</text>
+  <text x="72" y="365" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="48" font-weight="700" fill="#FFFFFF">un métasystème d'agents experts.</text>
+  <text x="72" y="425" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" fill="#C8CAD4">Configuration Genesis, moteurs mathématiques, red team et validation en 1 clic.</text>
   <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
     <rect x="72" y="490" width="250" height="86" rx="12" fill="#17112B" stroke="#7C3AED"/>
     <text x="92" y="530" font-size="26" font-weight="700" fill="#FFFFFF">87 – 92 s</text>
@@ -24,7 +24,7 @@
     <text x="358" y="556" font-size="13" fill="#B4B7C5">attaques red team repoussées</text>
     <rect x="604" y="490" width="250" height="86" rx="12" fill="#14151D" stroke="#2A2640"/>
     <text x="624" y="530" font-size="26" font-weight="700" fill="#FFFFFF">13 / 13</text>
-    <text x="624" y="556" font-size="13" fill="#B4B7C5">moteurs math (0,91 s)</text>
+    <text x="624" y="556" font-size="13" fill="#B4B7C5">solveurs math (0,91 s)</text>
     <rect x="870" y="490" width="250" height="86" rx="12" fill="#14151D" stroke="#2A2640"/>
     <text x="890" y="530" font-size="26" font-weight="700" fill="#FFFFFF">0 €</text>
     <text x="890" y="556" font-size="13" fill="#B4B7C5">frais de mise en place</text>
