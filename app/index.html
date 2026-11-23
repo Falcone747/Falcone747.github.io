@@ -5,395 +5,855 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EXIOR — Meta OS (démo)</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237c3aed'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='system-ui,sans-serif' font-size='32' font-weight='700' fill='white'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23222428'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='32' font-weight='650' fill='%23f4f4f5'%3EE%3C/text%3E%3C/svg%3E">
+<script>
+(function(){
+  var k="exior_theme";
+  function read(){try{return localStorage.getItem(k)}catch(e){return null}}
+  function sys(){return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}
+  function apply(t){document.documentElement.setAttribute("data-theme", t==="light"?"light":"dark")}
+  var s=read();
+  apply(s==="dark"||s==="light"?s:sys());
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(e){
+    var cur=read();
+    if(cur!=="dark"&&cur!=="light") apply(e.matches?"dark":"light");
+  });
+})();
+</script>
 <style>
+@font-face{
+  font-family:Inter;
+  src:url("fonts/Inter-latin.woff2") format("woff2");
+  font-weight:100 900;
+  font-style:normal;
+  font-display:swap;
+}
 :root{
-  --bg:#06030d;--bg2:#0b0617;--panel:#110a22;--panel2:#160d2c;--line:rgba(167,139,250,.16);--line2:rgba(167,139,250,.32);
-  --v:#7c3aed;--v2:#8b5cf6;--v3:#a78bfa;--v4:#c4b5fd;--glow:0 0 0 1px rgba(139,92,246,.35),0 10px 40px -10px rgba(124,58,237,.55);
-  --t:#f4f1ff;--t2:#b9b0d6;--t3:#7f76a3;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--r:16px;
+  --bg:#f4f4f5; --bg-elev:#f7f7f8; --surface:#ffffff; --surface-2:#f3f3f5;
+  --hover:rgba(20,20,22,.045); --line:#e4e4e7; --line-strong:#d4d4d8;
+  --text:#1a1a1e; --muted:#52525b; --faint:#6b6b75;
+  --accent:#5b45c6; --accent-hover:#4c399f; --accent-press:#3f2f88; --accent-ink:#ffffff;
+  --accent-mark:#5b45c6; --accent-ring:rgba(91,69,198,.35);
+  --ok:#0f7a4d; --warn:#8a5a10; --bad:#b42318;
+  --shadow:0 16px 40px rgba(20,20,22,.12); --scrim:rgba(20,20,22,.4);
+  --scrollbar:#c8c8ce; color-scheme:light;
 }
-*{box-sizing:border-box}html,body{margin:0;height:100%}
-body{background:radial-gradient(1200px 600px at 80% -10%,rgba(124,58,237,.22),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(139,92,246,.12),transparent 60%),var(--bg);
-  color:var(--t);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:var(--v3);text-decoration:none}
-.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
-aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(17,10,34,.92),rgba(8,5,18,.92));padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
-.logo{display:flex;align-items:center;gap:10px;padding:4px 10px 22px}
-.mark{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 210deg,#7c3aed,#c084fc,#6d28d9,#7c3aed);box-shadow:var(--glow);display:grid;place-items:center;font-weight:800}
-.logo b{font-size:15px;letter-spacing:.14em}.logo small{display:block;color:var(--v3);font-size:11px;letter-spacing:.08em}
-.nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:var(--t2);cursor:pointer;font-weight:500;transition:.15s;position:relative}
-.nav:hover{background:rgba(139,92,246,.08);color:var(--t)}
-.nav.on{background:linear-gradient(90deg,rgba(124,58,237,.28),rgba(124,58,237,.06));color:#fff;box-shadow:inset 0 0 0 1px var(--line2)}
-.nav.on:before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--v2);box-shadow:0 0 12px var(--v2)}
-.nav svg{width:18px;height:18px;flex:none;opacity:.9}
-.nav .cnt{margin-left:auto;background:var(--v);color:#fff;border-radius:20px;font-size:11px;padding:1px 8px;font-weight:700}
-.side-foot{margin-top:auto;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(124,58,237,.06);font-size:12px;color:var(--t2)}
-.side-foot b{color:#fff}
-main{min-width:0}
-.top{display:flex;align-items:center;gap:14px;padding:18px 32px;border-bottom:1px solid var(--line);background:rgba(6,3,13,.7);backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
-.top h1{font-size:18px;margin:0;font-weight:650;letter-spacing:-.01em}
-.top .sub{color:var(--t3);font-size:12px}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line2);color:var(--v4);background:rgba(124,58,237,.1)}
-.pill.ok{color:var(--ok);border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
-.pill.warn{color:var(--warn);border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
-.pill.bad{color:var(--bad);border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.08)}
-.dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141416; --bg-elev:#19191c; --surface:#1c1c1f; --surface-2:#26262a;
+    --hover:rgba(255,255,255,.05); --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+    --text:#ececef; --muted:#a1a1aa; --faint:#8d8d96;
+    --accent:#5b45c6; --accent-hover:#4c399f; --accent-press:#3f2f88; --accent-ink:#ffffff;
+    --accent-mark:#c9c0f6; --accent-ring:rgba(201,192,246,.55);
+    --ok:#5dcaa0; --warn:#e0b15a; --bad:#f08a84;
+    --shadow:0 18px 48px rgba(0,0,0,.45); --scrim:rgba(8,8,10,.62);
+    --scrollbar:#3a3a40; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141416; --bg-elev:#19191c; --surface:#1c1c1f; --surface-2:#26262a;
+  --hover:rgba(255,255,255,.05); --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+  --text:#ececef; --muted:#a1a1aa; --faint:#8d8d96;
+  --accent:#5b45c6; --accent-hover:#4c399f; --accent-press:#3f2f88; --accent-ink:#ffffff;
+  --accent-mark:#c9c0f6; --accent-ring:rgba(201,192,246,.55);
+  --ok:#5dcaa0; --warn:#e0b15a; --bad:#f08a84;
+  --shadow:0 18px 48px rgba(0,0,0,.45); --scrim:rgba(8,8,10,.62);
+  --scrollbar:#3a3a40; color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f4f4f5; --bg-elev:#f7f7f8; --surface:#ffffff; --surface-2:#f3f3f5;
+  --hover:rgba(20,20,22,.045); --line:#e4e4e7; --line-strong:#d4d4d8;
+  --text:#1a1a1e; --muted:#52525b; --faint:#6b6b75;
+  --accent:#5b45c6; --accent-hover:#4c399f; --accent-press:#3f2f88; --accent-ink:#ffffff;
+  --accent-mark:#5b45c6; --accent-ring:rgba(91,69,198,.35);
+  --ok:#0f7a4d; --warn:#8a5a10; --bad:#b42318;
+  --shadow:0 16px 40px rgba(20,20,22,.12); --scrim:rgba(20,20,22,.4);
+  --scrollbar:#c8c8ce; color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font:13px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{background:color-mix(in srgb, var(--text) 16%, transparent); color:var(--text)}
+*{scrollbar-width:thin; scrollbar-color:var(--scrollbar) transparent}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent-mark); outline-offset:2px}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.skip{position:absolute; left:8px; top:-40px; background:var(--surface); border:1px solid var(--line-strong); padding:6px 10px; border-radius:6px; z-index:50}
+.skip:focus{top:8px}
+.i{width:16px; height:16px; flex:none}
+.app{display:flex; min-height:100vh}
+.side{
+  width:232px; flex:none; display:flex; flex-direction:column;
+  background:var(--bg-elev); border-right:1px solid var(--line);
+  padding:14px 10px 12px; position:sticky; top:0; height:100vh; overflow:auto;
+}
+.brand{display:flex; align-items:center; gap:8px; padding:2px 8px 12px}
+.mark{width:22px; height:22px; border-radius:6px; background:var(--text); color:var(--bg-elev); display:grid; place-items:center; font-weight:650; font-size:12px}
+.brand-name{font-weight:650; font-size:13px; letter-spacing:.04em}
+.brand-name small{display:block; font-weight:500; letter-spacing:0; color:var(--faint); font-size:11px}
+.cmd-launch{
+  display:flex; align-items:center; gap:8px; width:100%; height:32px; margin:0 0 10px; padding:0 8px;
+  border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--faint); text-align:left;
+}
+.cmd-launch span{flex:1}
+.cmd-launch:hover{color:var(--text); border-color:var(--line-strong)}
+.navs{display:flex; flex-direction:column; gap:1px}
+.nav{
+  position:relative; display:flex; align-items:center; gap:8px; width:100%; height:30px; padding:0 8px;
+  border:0; border-radius:6px; background:transparent; color:var(--muted); font-size:13px; font-weight:500; text-align:left;
+}
+.nav-l{flex:1}
+.nav:hover{background:var(--hover); color:var(--text)}
+.nav.on{background:var(--hover); color:var(--text)}
+.nav.on::before{content:""; position:absolute; left:0; top:7px; bottom:7px; width:2px; border-radius:2px; background:var(--accent-mark)}
+.nav kbd{opacity:.75}
+.cnt{
+  min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--surface-2);
+  border:1px solid var(--line); color:var(--text); font-size:11px; display:inline-flex; align-items:center; justify-content:center;
+}
+kbd{
+  font:11px/1.4 Inter,ui-sans-serif,system-ui,sans-serif;
+  border:1px solid var(--line-strong); border-bottom-width:2px; border-radius:4px;
+  padding:0 4px; color:var(--muted); background:var(--surface);
+}
+.side-foot{margin-top:auto; padding:10px 8px 2px; border-top:1px solid var(--line); font-size:12px; color:var(--muted)}
+.side-foot b{color:var(--text); font-weight:600}
+.backdrop{display:none}
+.workspace{flex:1; min-width:0}
+.top{
+  position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px; height:52px; padding:0 20px;
+  background:var(--bg); border-bottom:1px solid var(--line);
+}
+.crumb{min-width:0; display:flex; align-items:baseline; gap:8px}
+.crumb h1{margin:0; font-size:14px; font-weight:600; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:34vw}
+.crumb .viewname{color:var(--muted); white-space:nowrap}
 .sp{flex:1}
-.meter{width:170px}.meter .bar{height:6px;border-radius:6px;background:rgba(167,139,250,.14);overflow:hidden}.meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--v),var(--v3))}
-.meter small{color:var(--t3);font-size:11px}
-.view{padding:28px 32px 60px;max-width:1400px}
-.grid{display:grid;gap:16px}.g6{grid-template-columns:repeat(6,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1.4fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g22{grid-template-columns:1fr 1fr}
-.card{background:linear-gradient(180deg,rgba(22,13,44,.85),rgba(14,8,28,.85));border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden}
-.card.hl{box-shadow:var(--glow);border-color:var(--line2)}
-.card h3{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.card h3 .pill{margin-left:auto}
-.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
-.kpi .l{color:var(--t3);font-size:12px}.kpi .s{font-size:12px;color:var(--v3);margin-top:6px}
-.kpi:after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.25),transparent 70%)}
-.sec-t{display:flex;align-items:end;gap:12px;margin:6px 0 16px}.sec-t h2{margin:0;font-size:22px;letter-spacing:-.02em}.sec-t p{margin:0;color:var(--t3)}
-.muted{color:var(--t3)}.small{font-size:12px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{padding:3px 9px;border-radius:8px;background:rgba(124,58,237,.12);border:1px solid var(--line);color:var(--v4);font-size:12px}
-.chip.g{background:rgba(52,211,153,.08);color:#a7f3d0;border-color:rgba(52,211,153,.25)}
-table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--t3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--line)}
-td{padding:11px 10px;border-bottom:1px solid rgba(167,139,250,.08);vertical-align:top}tr:hover td{background:rgba(124,58,237,.05)}
-.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:9px 16px;font-weight:650;cursor:pointer;font-size:13px;color:#fff;background:linear-gradient(135deg,#7c3aed,#9f67ff);box-shadow:0 6px 22px -8px rgba(124,58,237,.9);transition:.15s}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}.btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--v4);box-shadow:none}.btn.sm{padding:6px 11px;font-size:12px}
-.btn.okb{background:linear-gradient(135deg,#059669,#34d399)}.btn.no{background:transparent;border:1px solid rgba(248,113,113,.4);color:#fca5a5;box-shadow:none}
-.chat{display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 150px)}
-.thread{display:flex;flex-direction:column;min-height:0}.msgs{flex:1;overflow:auto;padding:6px 4px 16px;display:flex;flex-direction:column;gap:14px}
-.m{max-width:78%;padding:13px 16px;border-radius:16px;white-space:pre-wrap;line-height:1.55}
-.m.u{align-self:flex-end;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border-bottom-right-radius:4px;box-shadow:0 8px 26px -12px rgba(124,58,237,.9)}
-.m.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
-.m .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:11px;color:var(--t3)}
-.composer{display:flex;gap:10px;padding:12px;border:1px solid var(--line2);border-radius:16px;background:var(--panel);box-shadow:var(--glow)}
-.composer textarea{flex:1;background:transparent;border:0;color:var(--t);font:inherit;resize:none;outline:none;min-height:44px}
-.sugg{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.sugg span{cursor:pointer;padding:6px 11px;border-radius:999px;border:1px solid var(--line2);color:var(--v4);font-size:12px;background:rgba(124,58,237,.07)}
-.sugg span:hover{background:rgba(124,58,237,.2)}
-.agent{display:flex;flex-direction:column;gap:10px}.agent .hd{display:flex;align-items:center;gap:10px}
-.av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:13px;background:linear-gradient(135deg,rgba(124,58,237,.5),rgba(167,139,250,.25));border:1px solid var(--line2)}
-.agent .nm{font-weight:650}.agent .ms{color:var(--t2);font-size:13px;min-height:40px}
-.steps{display:flex;flex-direction:column;gap:2px}.step{display:grid;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px dashed rgba(167,139,250,.1);font-size:12.5px}
-.step i{width:10px;height:10px;border-radius:50%;background:var(--v2);box-shadow:0 0 10px var(--v2)}
-.act{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:start}
-.act .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(124,58,237,.16);border:1px solid var(--line2);font-size:20px}
-.act pre{white-space:pre-wrap;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0 0;color:var(--t2);font:12.5px/1.5 ui-monospace,Menlo,monospace}
-.doc{display:flex;align-items:center;gap:14px}.doc .ft{width:46px;height:54px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:11px;letter-spacing:.05em}
-.ft.docx{background:linear-gradient(135deg,#3b2a8f,#6d5dfc)}.ft.xlsx{background:linear-gradient(135deg,#155e48,#22c55e)}.ft.pptx{background:linear-gradient(135deg,#8a2c0d,#f97316)}.ft.pdf{background:linear-gradient(135deg,#7f1d1d,#ef4444)}
-.drop{border:1.5px dashed var(--line2);border-radius:16px;padding:26px;text-align:center;color:var(--t2);background:rgba(124,58,237,.05);cursor:pointer}
-.drop:hover{background:rgba(124,58,237,.12)}
-.plan{text-align:center}.plan .p{font-size:30px;font-weight:800;margin:6px 0}.plan.cur{box-shadow:var(--glow);border-color:var(--v2)}
-.login{max-width:420px;margin:12vh auto;text-align:center}.login input{width:100%;padding:12px 14px;margin:6px 0;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--t);font:inherit}
-.toast{position:fixed;right:24px;bottom:24px;background:var(--panel2);border:1px solid var(--line2);box-shadow:var(--glow);padding:12px 16px;border-radius:12px;display:none;z-index:9}
-svg text{fill:var(--t3);font-size:10px}
-.legend{display:flex;gap:14px;font-size:11px;color:var(--t3);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-@media (max-width:1100px){.g6{grid-template-columns:repeat(3,1fr)}.g3,.g4{grid-template-columns:1fr 1fr}.g2,.g22,.chat{grid-template-columns:1fr}}
-
-.nba{margin:0 0 18px}.nba-row{display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px solid rgba(167,139,250,.1)}.nba-row:last-child{border-bottom:0}
-.nba-n{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#7c3aed,#9f67ff);font-weight:800;font-size:12px;box-shadow:var(--glow)}
-.pal{display:none;position:fixed;inset:0;background:rgba(4,2,10,.72);backdrop-filter:blur(10px);z-index:20;place-items:start center;padding-top:12vh}
-.pal.on{display:grid}
-.pal .box{width:min(680px,92vw);background:linear-gradient(180deg,rgba(22,13,44,.98),rgba(14,8,28,.98));border:1px solid var(--line2);border-radius:18px;box-shadow:var(--glow);overflow:hidden}
-.pal input{width:100%;padding:16px 18px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--t);font:inherit;outline:none}
-.pal .hit{padding:12px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;cursor:pointer;border-bottom:1px solid rgba(167,139,250,.08);align-items:start}
-.pal .hit.on,.pal .hit:hover{background:rgba(124,58,237,.16)}
-.hintk{font-size:11px;color:var(--t3);border:1px solid var(--line);border-radius:8px;padding:3px 8px;letter-spacing:.04em}
-
-
-.burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;padding:0;font-size:18px}
-@media (max-width:900px){
-  .app{grid-template-columns:1fr}
-  aside{position:fixed;left:0;top:0;bottom:0;z-index:8;width:248px;transform:translateX(-110%);transition:transform .2s ease;box-shadow:none}
-  aside.open{transform:none;box-shadow:24px 0 60px rgba(0,0,0,.45)}
-  .burger{display:inline-flex}
-  .top{padding:14px 16px}.view{padding:18px 16px 80px}
-  .g6,.g4,.g3,.g2,.g22,.chat{grid-template-columns:1fr}
-  .meter{display:none}
+.usage{width:140px}
+.usage small{display:block; color:var(--faint); font-size:11px; margin-bottom:4px}
+.seg{display:flex; padding:2px; border:1px solid var(--line); border-radius:7px; background:var(--surface)}
+.seg button{height:24px; padding:0 8px; border:0; border-radius:5px; background:transparent; color:var(--muted); font-size:12px; font-weight:550}
+.seg button[aria-pressed="true"]{background:var(--text); color:var(--bg)}
+.burger{display:none}
+.iconbtn{
+  width:30px; height:30px; padding:0; display:inline-flex; align-items:center; justify-content:center;
+  border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--text);
 }
-
+.iconbtn:hover{background:var(--hover)}
+.view{padding:20px 24px 72px}
+.pagehead{margin:0 0 14px}
+.pagehead h2{margin:0; font-size:20px; font-weight:600; letter-spacing:-.02em}
+.pagehead p{margin:4px 0 0; color:var(--muted); max-width:68ch}
+.stack{display:flex; flex-direction:column; gap:12px}
+.split{display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); gap:12px}
+.cols-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.cols-3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+.panel.flush{padding:0; overflow:hidden}
+.panel-h{display:flex; align-items:center; gap:8px; margin:0 0 8px}
+.panel.flush .panel-h{padding:12px 14px 0}
+.panel-h h3{margin:0; font-size:13px; font-weight:600; letter-spacing:-.01em}
+.lead{margin:0 0 4px; color:var(--muted)}
+.metrics{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:1px; background:var(--line); padding:0}
+.metric{background:var(--surface); padding:12px 14px 13px; min-width:0}
+.metric .k{font-size:12px; color:var(--muted); margin:0 0 4px}
+.metric .n{font-size:18px; font-weight:600; letter-spacing:-.03em}
+.metric .s{font-size:12px; color:var(--faint); margin-top:4px}
+.nba-list{list-style:none; margin:0; padding:0}
+.nba-row{display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:12px; align-items:start; padding:12px 0; border-top:1px solid var(--line)}
+.nba-row:first-child{border-top:0; padding-top:2px}
+.rank{width:22px; height:22px; display:grid; place-items:center; color:var(--muted); font-size:12px; font-weight:600}
+.nba-title{font-weight:600; letter-spacing:-.01em}
+.nba-why{margin:3px 0 0; color:var(--muted); font-size:12.5px}
+.nba-side{display:flex; flex-direction:column; align-items:flex-end; gap:6px}
+.nba-actions{display:flex; gap:6px}
+.val{font-size:12px; color:var(--muted)}
+.status{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:550; color:var(--muted); white-space:nowrap}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)} .status.bad{color:var(--bad)}
+.dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+.chips{display:flex; flex-wrap:wrap; gap:4px}
+.chip{font-size:11.5px; padding:2px 6px; border-radius:5px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line)}
+.muted{color:var(--muted)} .faint{color:var(--faint)} .small{font-size:12px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; height:30px; padding:0 10px;
+  border-radius:6px; border:1px solid transparent; background:var(--accent); color:var(--accent-ink);
+  font-size:13px; font-weight:550; letter-spacing:-.01em;
+  transition:background .12s ease, border-color .12s ease;
+}
+.btn:hover{background:var(--accent-hover)}
+.btn:active{background:var(--accent-press)}
+.btn.sm{height:26px; padding:0 8px; font-size:12px}
+.btn.ghost{background:transparent; color:var(--text); border-color:var(--line-strong)}
+.btn.ghost:hover{background:var(--hover)}
+.btn.danger{background:transparent; color:var(--bad); border-color:var(--line-strong)}
+.btn.danger:hover{background:color-mix(in srgb, var(--bad) 12%, transparent)}
+.btn.block{width:100%}
+.chart{width:100%; height:auto; display:block; color:var(--faint)}
+.chart .gridl{stroke:var(--line); stroke-width:1}
+.chart .hist{fill:none; stroke:var(--text); stroke-width:1.75}
+.chart .fore{fill:none; stroke:var(--text); stroke-width:1.75; stroke-dasharray:4 3; opacity:.65}
+.chart .band{fill:var(--text); opacity:.08}
+.chart .now{fill:var(--surface); stroke:var(--text); stroke-width:1.75}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; font-size:12px; color:var(--muted)}
+.sw{display:inline-block; width:12px; height:3px; border-radius:2px; background:var(--text); margin-right:5px; vertical-align:middle}
+.sw.dash{background:linear-gradient(90deg, var(--text) 0 4px, transparent 4px 7px); background-size:7px 3px; opacity:.65}
+.sw.band{height:8px; opacity:.18; border-radius:2px}
+.sw.soft{opacity:.35}
+.sw.bad{background:var(--bad); opacity:1; height:8px}
+.bar-row{margin:8px 0}
+.bar-top{display:flex; justify-content:space-between; gap:8px; font-size:12px}
+.track{height:4px; border-radius:99px; background:var(--line); overflow:hidden; margin-top:5px}
+.track i{display:block; height:100%; background:var(--text); opacity:.72}
+.track.alt i{opacity:.35}
+.track i.bad{background:var(--bad); opacity:1}
+.pre{white-space:pre-wrap; margin:0; max-height:280px; overflow:auto; color:var(--muted); font:inherit}
+.table-wrap{overflow:auto}
+table{width:100%; border-collapse:collapse; font-size:13px}
+th{text-align:left; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--faint); padding:8px 12px; border-bottom:1px solid var(--line); white-space:nowrap}
+td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--hover)}
+.num{text-align:right; white-space:nowrap}
+.roster,.docs,.conns{list-style:none; margin:0; padding:0}
+.roster li,.docrow,.conn{
+  display:grid; gap:12px 16px; align-items:start; padding:12px 14px; border-top:1px solid var(--line);
+}
+.roster li:first-child,.docrow:first-child,.conn:first-child{border-top:0}
+.roster li{grid-template-columns:minmax(220px,1.3fr) minmax(180px,1fr)}
+.docrow{grid-template-columns:36px minmax(0,1fr) auto; align-items:center}
+.conn{grid-template-columns:minmax(0,1.1fr) minmax(0,1.2fr) auto; align-items:center}
+.who{display:flex; gap:10px; min-width:0}
+.av{
+  width:28px; height:28px; border-radius:6px; display:grid; place-items:center; flex:none;
+  background:var(--surface-2); border:1px solid var(--line); font-size:11px; font-weight:650;
+}
+.nm{font-weight:600}
+.ms{color:var(--muted); margin-top:2px}
+.ft{
+  width:36px; height:36px; border-radius:6px; display:grid; place-items:center;
+  border:1px solid var(--line); background:var(--surface-2); font-size:9px; font-weight:700; letter-spacing:.04em; color:var(--muted);
+}
+.act{display:grid; grid-template-columns:32px minmax(0,1fr) auto; gap:12px; align-items:start}
+.act .ic{
+  width:32px; height:32px; border-radius:8px; display:grid; place-items:center;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--muted);
+}
+.act pre, pre.code{
+  white-space:pre-wrap; background:var(--bg); border:1px solid var(--line); border-radius:8px;
+  padding:10px 12px; margin:8px 0 0; color:var(--muted);
+  font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.steps{display:flex; flex-direction:column}
+.step{display:grid; grid-template-columns:10px minmax(0,1fr) auto auto; gap:10px; align-items:center; padding:7px 0; border-top:1px solid var(--line); font-size:12.5px}
+.step:first-child{border-top:0}
+.step i{width:6px; height:6px; border-radius:50%; background:var(--faint); display:block}
+.chat{display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:12px; align-items:stretch; min-height:calc(100vh - 160px)}
+.thread{display:flex; flex-direction:column; min-height:0; min-width:0}
+.msgs{flex:1; overflow:auto; display:flex; flex-direction:column; gap:10px; padding:4px 2px 12px; min-height:240px}
+.m{max-width:min(72%,640px); padding:10px 12px; border-radius:10px; border:1px solid var(--line); white-space:pre-wrap; line-height:1.55}
+.m.u{align-self:flex-end; background:var(--surface-2)}
+.m.a{align-self:flex-start; background:var(--surface)}
+.meta{display:flex; flex-wrap:wrap; gap:4px; margin-top:8px}
+.sugg{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0}
+.sugg button{
+  background:transparent; border:1px solid var(--line); color:var(--text); border-radius:999px; padding:5px 10px; font-size:12px;
+}
+.sugg button:hover{background:var(--hover)}
+.composer{
+  display:flex; gap:8px; align-items:flex-end; border:1px solid var(--line-strong); border-radius:10px; padding:8px; background:var(--surface);
+}
+.composer:focus-within{border-color:var(--accent-mark); box-shadow:0 0 0 3px var(--accent-ring)}
+.composer textarea{flex:1; border:0; background:transparent; resize:none; min-height:40px; outline:none; padding:6px 4px}
+.checks{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+.checks li{display:flex; gap:8px; align-items:flex-start}
+.checks .i{margin-top:2px; color:var(--muted)}
+.plans{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.plan .price{font-size:26px; font-weight:600; letter-spacing:-.03em; margin:8px 0 4px}
+.plan.is-current{box-shadow:inset 0 0 0 1px var(--text)}
+.drop{
+  display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; color:var(--muted);
+  border:1px dashed var(--line-strong); border-radius:10px; padding:22px 16px; background:transparent; cursor:pointer;
+}
+.drop:hover{background:var(--hover); color:var(--text)}
+.drop b{color:var(--text); font-weight:600}
+.drop input{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+.gate{min-height:100vh; display:grid; place-items:center; padding:24px}
+.gate .panel{width:min(380px,100%)}
+.gate h2{margin:12px 0 4px; font-size:18px; letter-spacing:-.02em}
+.field{display:flex; flex-direction:column; gap:4px; margin-top:12px; font-size:12px; color:var(--muted)}
+.field input, .composer textarea{caret-color:var(--accent-mark)}
+.field input{
+  height:34px; border-radius:6px; border:1px solid var(--line-strong); background:var(--bg); color:var(--text); padding:0 10px; font-size:14px;
+}
+.field input::placeholder, .composer textarea::placeholder, .pal-in input::placeholder{color:var(--faint)}
+.toast{
+  position:fixed; right:16px; bottom:16px; max-width:min(380px, calc(100vw - 32px));
+  background:var(--surface); color:var(--text); border:1px solid var(--line-strong); border-radius:8px;
+  box-shadow:var(--shadow); padding:10px 12px; display:none; z-index:40;
+}
+.pal,.modal{position:fixed; inset:0; display:none; place-items:start center; padding:14vh 12px 12px; background:var(--scrim); z-index:30}
+.pal.on,.modal.on{display:grid}
+.box{width:min(640px,100%); background:var(--surface); border:1px solid var(--line-strong); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.modal .box{width:min(480px,100%)}
+.pal-in{display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:1px solid var(--line); color:var(--faint)}
+.pal-in input{flex:1; height:48px; border:0; background:transparent; outline:none; font-size:15px; color:var(--text)}
+.pal-g{padding:10px 14px 2px; font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--faint)}
+.hit{
+  width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center;
+  padding:10px 14px; border:0; border-top:1px solid var(--line); background:transparent; text-align:left; color:inherit;
+}
+.hit:hover{background:var(--hover)}
+.hit.on{background:var(--surface-2)}
+.pal .box{display:flex; flex-direction:column; max-height:min(72vh,560px)}
+#palhits{overflow:auto; min-height:0}
+.pal-in:focus-within{box-shadow:inset 0 -2px 0 var(--accent-mark)}
+.hit-t{display:flex; flex-direction:column; gap:2px; min-width:0}
+.hit-t b{font-weight:600}
+.hit-k{font-size:12px; color:var(--muted)}
+.pal-foot,.help-body{display:flex; gap:14px; flex-wrap:wrap; padding:8px 14px; border-top:1px solid var(--line); color:var(--faint); font-size:12px}
+.help-body{flex-direction:column; gap:8px; border-top:0; padding:4px 16px 16px; color:var(--text)}
+.help-body div{display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); padding-top:8px}
+.help-h{display:flex; align-items:center; justify-content:space-between; padding:12px 14px 8px}
+.help-h h2{margin:0; font-size:14px}
+.empty{margin:0; color:var(--muted)}
+.metrics.m4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){
+  .metrics,.metrics.m4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .split,.chat,.plans{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .burger{display:inline-flex}
+  .side{position:fixed; z-index:20; left:0; top:0; transform:translateX(-105%); box-shadow:var(--shadow)}
+  .side.open{transform:none}
+  .backdrop{position:fixed; inset:0; border:0; padding:0; background:var(--scrim); z-index:19}
+  .backdrop.show{display:block}
+  .top{padding:0 10px; gap:6px}
+  .top > .status, .top > .chip, .crumb .faint, .crumb .viewname, .helpbtn{display:none}
+  .crumb{flex:1}
+  .crumb h1{max-width:100%}
+  .view{padding:16px 14px 80px}
+  .usage{display:none}
+  .cols-3,.cols-2,.roster li,.conn{grid-template-columns:1fr}
+  .nba-row{grid-template-columns:28px minmax(0,1fr)}
+  .nba-side{grid-column:2; align-items:flex-start}
+  .seg button{padding:0 7px}
+}
+@media (max-width:560px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .act{grid-template-columns:32px minmax(0,1fr)}
+  .act .actions{grid-column:2}
+}
+@media (prefers-reduced-motion:no-preference){
+  .pal.on .box,.modal.on .box{animation:rise .16s cubic-bezier(.2,.7,.2,1)}
+  .side{transition:transform .16s cubic-bezier(.2,.7,.2,1)}
+}
+@keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#contenu">Aller au contenu</a>
 <div id="root"></div>
 <div class="pal" id="pal" onclick="if(event.target===this)closePal()">
-  <div class="box" role="dialog" aria-label="Prochaines actions">
-    <input id="palq" placeholder="Que voulez-vous faire ?  (↑↓ Entrée pour activer, Échap pour fermer)" oninput="filterPal()" onkeydown="navPal(event)">
+  <div class="box" role="dialog" aria-modal="true" aria-label="Prochaines actions">
+    <div class="pal-in">
+      <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="palq" placeholder="Que voulez-vous faire ?" autocomplete="off" spellcheck="false" oninput="filterPal()" onkeydown="navPal(event)">
+    </div>
     <div id="palhits"></div>
+    <div class="pal-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> naviguer</span><span><kbd>↵</kbd> activer</span><span><kbd>esc</kbd> fermer</span></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="modal" id="help" onclick="if(event.target===this)closeHelp()">
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="help-h"><h2 id="help-title">Raccourcis</h2><button class="iconbtn" onclick="closeHelp()" aria-label="Fermer">
+      <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+    </button></div>
+    <div class="help-body">
+      <div><span>Palette de commandes</span><span><kbd>⌘</kbd> <kbd>K</kbd></span></div>
+      <div><span>Aller à un écran</span><span><kbd>G</kbd> puis la lettre</span></div>
+      <div><span>Graphite noir / blanc</span><span><kbd>Maj</kbd> <kbd>T</kbd></span></div>
+      <div><span>Menu sur petit écran</span><span><kbd>[</kbd></span></div>
+      <div><span>Cette aide</span><span><kbd>?</kbd></span></div>
+      <div><span>Fermer</span><span><kbd>Échap</kbd></span></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="demo-boot.js"></script>
 <script>
 const Q=new URLSearchParams(location.search);
-/* démo publique : pas de jeton en query */
-const S={t:localStorage.getItem("exior_t"),k:localStorage.getItem("exior_k"),d:null,view:(location.hash.slice(2)||"tableau")};
+if(!window.EXIOR_PAGES_DEMO){
+  if(Q.get("tenant")) localStorage.setItem("exior_t", Q.get("tenant"));
+  if(Q.get("token")) localStorage.setItem("exior_k", Q.get("token"));
+}
+const S={t:localStorage.getItem("exior_t"), k:localStorage.getItem("exior_k"), d:null, view:(location.hash.slice(2)||"tableau")};
 const $=s=>document.querySelector(s);
-const fmt=(v,d=0)=>v==null?"—":Number(v).toLocaleString("fr-FR",{maximumFractionDigits:d,minimumFractionDigits:d});
-const eur=v=>v==null?"—":fmt(v)+" €"; const eurc=v=>v==null?"—":Math.abs(v)>=1e6?fmt(v/1e6,2)+" M€":Math.abs(v)>=1e5?fmt(v/1e3,0)+" k€":eur(v); const pct=v=>v==null?"—":fmt(v*100,1)+" %";
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"\x26amp;","<":"\x26lt;",">":"\x26gt;",'"':"\x26quot;"}[c]));
-const lab=id=>id.replace(/^agent_/,"").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
-function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",3200)}
-
-/* Démo statique : aucune requête réseau, aucun jeton, aucun modèle IA en direct. */
-const DEMO = {"tenant": {"id": "demo", "raison_sociale": "Maison Brume (entreprise fictive)", "plan": "pilotage", "statut": "actif"}, "jumeau": {"Campagne": 4, "Commande": 360, "EcritureComptable": 130, "Facture": 60, "Produit": 20}, "kpis": {"produits": 4222673.27, "charges": 3696337.42, "resultat": 526335.85, "taux_marge_nette": 0.12, "encours_total": 110503.77, "echu_plus_60j": 86899.73, "nb_clients": 9, "part_top1": 0.42}, "prevision_ventes": {"indicateur": "ventes", "mois_historique": 30, "dernier_mois": "2026-10", "derniere_valeur": 65610.84, "modele": "Holt-Winters additif", "params": {"alpha": 0.01, "beta": 0.01, "gamma": 0.91}, "prevision": [95448.28, 112160.3, 60226.11, 72952.13, 68521.54, 70977.83], "ic80": [[90845.63, 100050.93], [105651.18, 118669.42], [52254.09, 68198.13], [63746.84, 82157.42], [58229.71, 78813.37], [59703.7, 82251.96]]}, "historique_ventes": [61984.07999999999, 61047.48, 88741.79999999999, 106203.84000000003, 54113.75999999998, 67341.84, 61541.87999999998, 64493.16, 66762.24000000002, 67481.75999999998, 53227.55999999999, 51651.35999999999, 66467.39999999998, 65610.84], "encours": {"au": "2026-11-22", "encours_total": 110503.77, "part_facture_impayee": 0.38, "balance_agee": {"non_echu": 0.0, "0_30": 8864.42, "31_60": 14739.62, "61_90": 5058.41, "plus_90": 81841.32}, "echu_plus_60j": 86899.73, "top_debiteurs": [{"client": "Client fictif A", "montant": 50591.62}, {"client": "Client fictif B", "montant": 19500.48}, {"client": "Client fictif I", "montant": 17330.79}, {"client": "Client fictif E", "montant": 7872.06}, {"client": "Client fictif H", "montant": 7333.43}], "relances_a_preparer": 5}, "budget_pub": {"budget": 11500.0, "repartition_actuelle": {"google_ads": 4200.0, "meta_ads": 5200.0, "email": 600.0, "tiktok_ads": 1500.0}, "revenu_actuel": 36700.0, "allocation_optimale": {"google_ads": 5750.0, "meta_ads": 3450.0, "email": 2012.5, "tiktok_ads": 287.5}, "revenu_attendu": 41417.76, "gain_estime": 4717.76, "controle_slsqp_ecart_pct": 0.022, "solveur": "HiGHS (LP par morceaux) + contrôle SciPy SLSQP", "hypothese": "saturation b = 1.5 × dépense actuelle par canal (à recalibrer avec l'historique)"}, "concentration": {"nb_clients": 9, "part_top1": 0.42, "part_top5": 0.85, "indice_herfindahl": 0.24, "alerte": "dépendance forte"}, "stocks": {"references": 20, "sous_seuil": 5, "detail": [{"sku": "SKU-000", "qte": 0.0, "seuil": 30.0}, {"sku": "SKU-004", "qte": 8.0, "seuil": 30.0}, {"sku": "SKU-008", "qte": 16.0, "seuil": 30.0}, {"sku": "SKU-012", "qte": 24.0, "seuil": 30.0}, {"sku": "SKU-019", "qte": 3.0, "seuil": 30.0}]}, "agents": [{"id": "orchestrateur", "mission": "Reçoit les demandes du dirigeant, délègue aux spécialistes, consolide", "statut": "actif", "objets_lecture": ["*"], "brouillons": false, "habilitation_pii": true, "expertise": null, "connecteurs": ["fichiers", "gmail", "google_ads", "klaviyo", "meta_ads", "navigateur_logisticien_3pl_maison", "pennylane", "shopify", "stripe"]}, {"id": "reviseur", "mission": "Contrôle chaque chiffre contre les sorties des moteurs ; bloque ou fait corriger", "statut": "actif", "objets_lecture": ["ResultatMoteur"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": []}, {"id": "agent_finance", "mission": "Analyse financière, trésorerie, encours clients, scénarios Monte Carlo", "statut": "actif", "objets_lecture": ["EcritureComptable", "Facture", "TransactionBancaire"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 6, "cache": true}, "connecteurs": ["fichiers", "pennylane", "stripe"]}, {"id": "agent_strategie", "mission": "Initiatives, portefeuille optimal, architecture cible", "statut": "actif", "objets_lecture": ["ResultatMoteur", "EcritureComptable", "Facture"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": ["fichiers", "pennylane", "stripe"]}, {"id": "agent_cyber", "mission": "Socle de sécurité, droits, alertes CERT-FR", "statut": "actif", "objets_lecture": ["Configuration"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 1, "cache": true}, "connecteurs": []}, {"id": "agent_veille", "mission": "Veille macro, sectorielle, réglementaire, tech (sources officielles)", "statut": "actif", "objets_lecture": ["SourceExterne"], "brouillons": false, "habilitation_pii": false, "expertise": null, "connecteurs": []}, {"id": "agent_secretariat", "mission": "Tri des mails et documents, brouillons de réponse", "statut": "actif", "objets_lecture": ["Mail", "Document"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["gmail", "navigateur_logisticien_3pl_maison"]}, {"id": "agent_recouvrement", "mission": "Relances d'impayés (brouillons), DSO", "statut": "actif", "objets_lecture": ["Facture", "Client", "TransactionBancaire"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 6, "cache": true}, "connecteurs": ["fichiers", "klaviyo", "pennylane", "shopify", "stripe"]}, {"id": "agent_acquisition", "mission": "Allocation du budget publicitaire, attribution", "statut": "actif", "objets_lecture": ["Campagne"], "brouillons": false, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["google_ads", "klaviyo", "meta_ads"]}, {"id": "agent_crm", "mission": "Emailing, tests A/B bayésiens, réachat", "statut": "actif", "objets_lecture": ["Client", "Campagne"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 2, "cache": true}, "connecteurs": ["fichiers", "google_ads", "klaviyo", "meta_ads", "shopify", "stripe"]}, {"id": "agent_supply", "mission": "Prévision de ventes, anti-rupture, réappro", "statut": "actif", "objets_lecture": ["Produit", "Stock", "Commande"], "brouillons": true, "habilitation_pii": false, "expertise": {"taux_verification": 1.0, "regles": 3, "cache": true}, "connecteurs": ["fichiers", "shopify"]}, {"id": "agent_service_client", "mission": "Tri des demandes clients, brouillons de réponse", "statut": "actif", "objets_lecture": ["Mail", "Commande", "Client"], "brouillons": true, "habilitation_pii": true, "expertise": {"taux_verification": 1.0, "regles": 1, "cache": true}, "connecteurs": ["fichiers", "gmail", "klaviyo", "shopify", "stripe"]}], "initiatives": [{"id": "I-PUB", "titre": "Réallouer le budget publicitaire à budget constant (HiGHS)", "domaine": "marketing", "gain_annuel_brut": 22645.25, "probabilite_succes": 0.65, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.25, "valeur_esperee": 14719.41, "valeur_ajustee_risque": 11039.56, "agents": ["agent_acquisition"], "connecteurs": ["google_ads", "meta_ads"], "base_calcul": "gain de revenu modélisé 4717.76 €/période × 12 × marge 40 % (hyp.)"}, {"id": "I-MAIL", "titre": "Tri des mails et brouillons de réponse automatiques", "domaine": "automatisation", "gain_annuel_brut": 8930.0, "probabilite_succes": 0.85, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.1, "valeur_esperee": 7590.5, "valeur_ajustee_risque": 6831.45, "agents": ["agent_secretariat"], "connecteurs": ["gmail", "outlook"], "base_calcul": "5 h/semaine économisées (hyp.) × 47 sem × 38 €/h"}, {"id": "I-CYB", "titre": "Socle cyber : MFA, sauvegardes testées, alertes CERT-FR", "domaine": "cyber", "gain_annuel_brut": 3000.0, "probabilite_succes": 0.9, "cout_cash": 0, "charge_jours_agent": 0.5, "risque": 0.05, "valeur_esperee": 2700.0, "valeur_ajustee_risque": 2565.0, "agents": ["agent_cyber"], "connecteurs": [], "base_calcul": "réduction de 2 % d'un risque d'incident à 150 000 € (hyp.)"}, {"id": "I-REC", "titre": "Relances d'impayés préparées automatiquement (brouillons validés en un clic)", "domaine": "tresorerie", "gain_annuel_brut": 3306.75, "probabilite_succes": 0.8, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.1, "valeur_esperee": 2645.4, "valeur_ajustee_risque": 2380.86, "agents": ["agent_recouvrement"], "connecteurs": ["fichiers", "gmail"], "base_calcul": "échu > 60 j 86899.73 € × 0.35 recouvré × coût du financement + 1 h/sem économisée"}, {"id": "I-STK", "titre": "Réapprovisionnement anti-rupture (brouillons de commandes)", "domaine": "operations", "gain_annuel_brut": 3000.0, "probabilite_succes": 0.7, "cout_cash": 0, "charge_jours_agent": 1, "risque": 0.2, "valeur_esperee": 2100.0, "valeur_ajustee_risque": 1680.0, "agents": ["agent_supply"], "connecteurs": ["shopify", "fichiers"], "base_calcul": "5 références sous seuil × 600 € de marge préservée/an (hyp.)"}, {"id": "I-DIV", "titre": "Plan de diversification commerciale (dépendance au 1er client)", "domaine": "strategie", "gain_annuel_brut": 5000.0, "probabilite_succes": 0.4, "cout_cash": 0, "charge_jours_agent": 3, "risque": 0.4, "valeur_esperee": 2000.0, "valeur_ajustee_risque": 1200.0, "agents": ["agent_commercial", "agent_strategie"], "connecteurs": ["hubspot"], "base_calcul": "part du 1er client 0.42 ; valeur = réduction de risque (hyp. 5 000 €/an)"}], "portefeuille": {"statut": "OPTIMAL", "solveur": "OR-Tools CP-SAT", "selection": ["I-REC", "I-PUB", "I-STK", "I-MAIL", "I-CYB"], "valeur_totale": 24496.87, "cout_total": 0.0}, "architecture": {"connecteurs_a_ajouter": ["outlook"], "agents_mobilises": ["agent_acquisition", "agent_cyber", "agent_recouvrement", "agent_secretariat", "agent_supply"], "agents_a_creer": []}, "hypotheses": {"cout_horaire_charge_eur": 38.0, "semaines_an": 47, "taux_recouvrement_relance": 0.35, "taux_cout_financement": 0.05, "note": "Hypothèses standard, affichées au dirigeant, recalibrées automatiquement au 1er mois sur ses données."}, "actions": [{"id": 1, "ts": 1795323770.0639246, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif A", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 50591.62, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 50 591,62 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 2, "ts": 1795323770.0647237, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif B", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 19500.48, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 19 500,48 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 3, "ts": 1795323770.0650873, "acteur": "agent_recouvrement", "action": "relance_impaye", "cible": "Client fictif I", "apres": "{\"objet\": \"Relance — factures échues\", \"montant\": 17330.79, \"corps\": \"Bonjour, sauf erreur de notre part, des factures pour un total de 17 330,79 € restent impayées. Pouvez-vous nous indiquer la date de règlement prévue ? Cordialement.\"}", "statut": "a_valider"}, {"id": 4, "ts": 1795323770.0737536, "acteur": "agent_acquisition", "action": "reallocation_budget_pub", "cible": "google_ads, meta_ads, email, tiktok_ads", "apres": "{\"actuel\": {\"google_ads\": 4200.0, \"meta_ads\": 5200.0, \"email\": 600.0, \"tiktok_ads\": 1500.0}, \"propose\": {\"google_ads\": 5750.0, \"meta_ads\": 3450.0, \"email\": 2012.5, \"tiktok_ads\": 287.5}, \"gain_estime\": 4717.76}", "statut": "a_valider"}, {"id": 5, "ts": 1795323770.074476, "acteur": "agent_supply", "action": "brouillon_reappro", "cible": "5 références", "apres": "{\"references\": [\"SKU-000\", \"SKU-004\", \"SKU-008\", \"SKU-012\", \"SKU-019\"]}", "statut": "a_valider"}], "documents": [{"nom": "plan_initiatives.xlsx", "taille_ko": 7.9, "type": "xlsx"}, {"nom": "presentation.pdf", "taille_ko": 30.9, "type": "pdf"}, {"nom": "presentation.pptx", "taille_ko": 36.5, "type": "pptx"}, {"nom": "rapport_strategique.docx", "taille_ko": 36.9, "type": "docx"}, {"nom": "rapport_strategique.pdf", "taille_ko": 60.7, "type": "pdf"}], "connecteurs": [{"id": "fichiers", "categorie": "import de fichiers", "auth": "fichier", "connecte": true, "outils": ["importer_fichier"], "objets": ["EcritureComptable", "Facture", "Client", "Commande", "Produit", "Stock", "TransactionBancaire"], "serveur_mcp": null}, {"id": "gmail", "categorie": "messagerie", "auth": "oauth2", "connecte": false, "outils": ["list_threads", "create_draft"], "objets": ["Mail", "Document"], "serveur_mcp": null}, {"id": "google_ads", "categorie": "publicité", "auth": "oauth2", "connecte": false, "outils": ["search_stream", "update_budget"], "objets": ["Campagne"], "serveur_mcp": null}, {"id": "klaviyo", "categorie": "emailing", "auth": "api_key", "connecte": false, "outils": ["campaign_metrics", "create_campaign_draft"], "objets": ["Campagne", "Client"], "serveur_mcp": null}, {"id": "meta_ads", "categorie": "publicité", "auth": "oauth2", "connecte": false, "outils": ["ads_insights", "update_budget"], "objets": ["Campagne"], "serveur_mcp": null}, {"id": "navigateur_logisticien_3pl_maison", "categorie": "inconnu — lecture via navigateur, à valider", "auth": "navigateur", "connecte": false, "outils": ["browse_read"], "objets": ["Document"], "serveur_mcp": null}, {"id": "pennylane", "categorie": "comptabilité", "auth": "oauth2", "connecte": false, "outils": ["grand_livre", "factures"], "objets": ["EcritureComptable", "Facture", "Fournisseur"], "serveur_mcp": null}, {"id": "shopify", "categorie": "e-commerce", "auth": "oauth2", "connecte": false, "outils": ["list_orders", "get_products", "update_inventory"], "objets": ["Commande", "Produit", "Client", "Stock"], "serveur_mcp": "Shopify Dev MCP"}, {"id": "stripe", "categorie": "paiements", "auth": "api_key", "connecte": false, "outils": ["list_charges", "list_invoices"], "objets": ["Facture", "Client"], "serveur_mcp": "Stripe MCP (officiel)"}], "usage": {"mois": "2026-11", "taches": 4, "incluses": 1200, "supplementaires": 0, "a_facturer_sup_eur": 0.0, "cout_ia_usd": 0.00909}, "plans": {"essentiel": {"prix_mois_eur": 590, "taches_incluses": 400}, "pilotage": {"prix_mois_eur": 1490, "taches_incluses": 1200}, "direction": {"prix_mois_eur": 3490, "taches_incluses": 3500}}, "genesis": {"famille": "commerce_ecommerce", "methode_secteur": "NAF 47.91B", "duree_totale_s": 1.214, "cout_total_usd": 0.013606, "appels_llm": 19, "politiques": {"regles": 29, "tests": "conformes"}, "passerelle": "bloquées", "red_team": {"attaques": 10, "defenses_reussies": 10, "tentatives_interdites_du_modele": 4, "interdits_executes": 0}, "moteurs": "opérationnels", "agents_bloques": [], "bibliotheque": {"publies": 21, "refuses_anonymisation": 0}, "etapes": [{"etape": "1. détection des outils (catalogue + bibliothèque)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "2. famille sectorielle (NAF)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "3. coffre à secrets chiffré", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "4. manifestes MCP des connecteurs", "duree_s": 0.001, "cout_usd": 0.0}, {"etape": "5. jumeau numérique (objets importés)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "6. roster d'agents (noyau + pack sectoriel)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "7a. expertise (NAF, ROME, réglementation, docs) + vérification des citations", "duree_s": 0.007, "cout_usd": 0.0}, {"etape": "7b. prompts sur mesure (bibliothèque puis modèle économique)", "duree_s": 0.007, "cout_usd": 0.0}, {"etape": "8. politiques Cedar (refus par défaut)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "9. tests automatiques des politiques", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "9b. harness + sandbox + tests fonctionnels des moteurs", "duree_s": 0.07, "cout_usd": 0.0}, {"etape": "9c. passerelle : actions interdites forcées (modèle supposé compromis)", "duree_s": 0.003, "cout_usd": 0.0}, {"etape": "9d. red team automatique", "duree_s": 0.007, "cout_usd": 0.012511}, {"etape": "9e. porte d'activation", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "10. veille (sources officielles live)", "duree_s": 0.0, "cout_usd": 0.0}, {"etape": "11. calculs initiaux (moteurs déterministes)", "duree_s": 0.003, "cout_usd": 0.0}, {"etape": "12. mémoire initialisée (+ skills éprouvés de la bibliothèque)", "duree_s": 0.001, "cout_usd": 0.0}, {"etape": "13. initiatives + portefeuille optimal (CP-SAT)", "duree_s": 0.004, "cout_usd": 0.0}, {"etape": "14. synthèse stratégique (squelette déterministe + reformulation revue)", "duree_s": 0.001, "cout_usd": 0.001095}, {"etape": "15. suite bureautique (docx, xlsx, pptx, PDF)", "duree_s": 1.073, "cout_usd": 0.0}, {"etape": "16. publication anonymisée dans la bibliothèque partagée (flywheel)", "duree_s": 0.017, "cout_usd": 0.0}], "veille": []}, "synthese": "Maison Brume (entreprise fictive) — premiers constats du Meta OS (chiffres calculés par les moteurs).\nActivité : 4 222 673 € de produits pour un résultat de 526 336 € (marge nette 12 %).\nTrésorerie immobilisée : 110 504 € d'encours clients, dont 86 900 € échus depuis plus de 60 jours.\nDépendance : le premier client représente 42 % du chiffre d'affaires (9 clients).\nPortefeuille recommandé (5 initiatives) : 24 497 € par an, ajustés du risque.\n- Réallouer le budget publicitaire à budget constant (HiGHS) : 11 040 € par an\n- Tri des mails et brouillons de réponse automatiques : 6 831 € par an\n- Socle cyber : MFA, sauvegardes testées, alertes CERT-FR : 2 565 € par an\n- Relances d'impayés préparées automatiquement (brouillons validés en un clic) : 2 381 € par an\n- Réapprovisionnement anti-rupture (brouillons de commandes) : 1 680 € par an\nLes actions engageantes sont prêtes sous forme de brouillons à valider.", "conversations": [{"ts": 1795323770.0377905, "agent": "agent", "tache": "Quel est notre encours clients et qui relancer en priorité ?", "resultat": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "ok": 1, "cout": 0.0030600000000000002, "modele": "modèle expert", "skill": null}, {"ts": 1795323770.0493996, "agent": "agent", "tache": "Comment répartir le budget publicitaire entre les canaux ?", "resultat": "À budget constant (11 500 €), la répartition optimale (HiGHS) est : google ads 4 200 € → 5 750 € ; meta ads 5 200 € → 3 450 € ; email 600 € → 2 012 € ; tiktok ads 1 500 € → 288 €. Revenu attendu 41 418 € contre 36 700 € aujourd'hui, soit +4 718 € par période.", "ok": 1, "cout": 0.0030837499999999997, "modele": "modèle expert", "skill": null}, {"ts": 1795323770.058016, "agent": "agent", "tache": "Quelle est la prévision des ventes pour les prochains mois ?", "resultat": "Prévision (Holt-Winters additif, 30 mois d'historique) : 95 448 € le mois prochain (intervalle 80 % : 90 846 € à 100 051 €), puis 112 160 €, 60 226 €.", "ok": 1, "cout": 0.0029474999999999996, "modele": "modèle expert", "skill": null}, {"ts": 1795323770.0610955, "agent": "agent", "tache": "Quel est notre encours clients et qui relancer en priorité ?", "resultat": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "ok": 1, "cout": 0.0, "modele": "déterministe (skill rejoué)", "skill": "skill_e2ade25830"}], "audit": {"ok": true, "entrees": 57}, "bibliotheque": {"elements": {"connecteur": 8, "expertise": 8, "pack": 1, "politiques": 1, "prompt": 12}, "reutilisations": 21, "economie_ia_usd": 0.0416}, "copilote": {"famille": "commerce_ecommerce", "genere_en": "deterministe", "appels_llm": 0, "actions": [{"id": "732de53231ce", "kind": "valider", "cible": "1", "titre": "Valider la relance — Client fictif A", "pourquoi": "Impact chiffré : 50 592 € à relancer.", "valeur_attendue_eur": 50591.62, "score": 101183.24, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 1, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "0485b3467810", "kind": "valider", "cible": "2", "titre": "Valider la relance — Client fictif B", "pourquoi": "Impact chiffré : 19 500 € à relancer.", "valeur_attendue_eur": 19500.48, "score": 39000.96, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 2, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "561358796c28", "kind": "valider", "cible": "3", "titre": "Valider la relance — Client fictif I", "pourquoi": "Impact chiffré : 17 331 € à relancer.", "valeur_attendue_eur": 17330.79, "score": 34661.58, "priorite": "immediate", "verbe": "Activer", "deblocage": {"action_id": 3, "type_action": "relance_impaye"}, "reporté": false, "preuve_similaire": 0}, {"id": "4b631725920c", "kind": "connecter", "cible": "meta_ads", "titre": "Connecter Meta Ads", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 11 040 € / an.", "valeur_attendue_eur": 11039.56, "score": 16007.362, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "meta_ads", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "dfe7eaf28024", "kind": "connecter", "cible": "google_ads", "titre": "Connecter Google Ads", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 11 040 € / an.", "valeur_attendue_eur": 11039.56, "score": 16007.362, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "google_ads", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "6df71efc5866", "kind": "connecter", "cible": "gmail", "titre": "Connecter Gmail", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 9 212 € / an.", "valeur_attendue_eur": 9212.31, "score": 13357.8495, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "gmail", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}, {"id": "046d8d746e36", "kind": "importer", "cible": "import:TransactionBancaire", "titre": "Importer un relevé bancaire ou connecter la banque", "pourquoi": "Sans les mouvements bancaires, la prévision de trésorerie ne peut pas tourner.", "valeur_attendue_eur": 7000, "score": 11200.0, "priorite": "lacune", "verbe": "Activer", "deblocage": {"objet": "TransactionBancaire", "type_attendu": "TransactionBancaire"}, "reporté": false, "preuve_similaire": 0}, {"id": "0ad354060d9a", "kind": "connecter", "cible": "outlook", "titre": "Connecter Outlook", "pourquoi": "Retenu par votre portefeuille d'initiatives — débloque environ 6 831 € / an.", "valeur_attendue_eur": 6831.45, "score": 9905.6025, "priorite": "connecteur", "verbe": "Activer", "deblocage": {"connecteur": "outlook", "requis_initiatives": true}, "reporté": false, "preuve_similaire": 0}], "total": 17, "message": "Voici ce que je ferais en premier — classé depuis votre jumeau, sans appel IA."}};
-const QA = [{"keys": ["encours", "relanc", "impaye", "creance", "priorite", "debiteur"], "reponse": "Encours clients : 110 504 €, dont 86 900 € échus depuis plus de 60 jours. À relancer en priorité : Client fictif A (50 592 €), Client fictif B (19 500 €), Client fictif I (17 331 €). J'ai préparé les relances : elles attendent votre validation dans « Validations ».", "outils": ["encours_clients"], "skill": null, "modele": "modèle expert"}, {"keys": ["budget", "publicit", "pub ", "canal", "canaux", "acquisition", "repartir", "répartir"], "reponse": "À budget constant (11 500 €), la répartition optimale (HiGHS) est : google ads 4 200 € → 5 750 € ; meta ads 5 200 € → 3 450 € ; email 600 € → 2 012 € ; tiktok ads 1 500 € → 288 €. Revenu attendu 41 418 € contre 36 700 € aujourd'hui, soit +4 718 € par période.", "outils": ["allocation_budget"], "skill": null, "modele": "modèle expert"}, {"keys": ["prevision", "prévision", "ventes", "prochains mois", "holt"], "reponse": "Prévision (Holt-Winters additif, 30 mois d'historique) : 95 448 € le mois prochain (intervalle 80 % : 90 846 € à 100 051 €), puis 112 160 €, 60 226 €, 72 952 €.", "outils": ["prevision"], "skill": null, "modele": "modèle expert"}, {"keys": ["tresorerie", "trésorerie", "banque", "cash"], "reponse": "Il me manque les mouvements bancaires pour prévoir la trésorerie (0 mois disponibles, 6 minimum). Le copilote vous propose d'importer un relevé ou de connecter la banque.", "outils": ["prevision"], "skill": null, "modele": "déterministe (démo)"}, {"keys": ["rupture", "stock", "reappro", "réappro", "produits risquent"], "reponse": "5 références sur 20 sont sous le seuil : SKU-000 (0/30), SKU-004 (8/30), SKU-008 (16/30), SKU-012 (24/30), SKU-019 (3/30). Brouillon de réapprovisionnement prêt.", "outils": ["stocks_a_risque"], "skill": null, "modele": "modèle expert"}, {"keys": ["risque", "perte", "monte carlo", "resultat", "résultat"], "reponse": "Simulation Monte Carlo du résultat (20 000 tirages, hypothèse prudente : charges fixes) : médiane 523 495 €, intervalle 5–95 % de −179 162 € à 1 246 798 €. Probabilité de perte : 11 %.", "outils": ["risque_resultat"], "skill": null, "modele": "modèle expert"}];
-const LS = "exior_demo_etat_v1";
-const DOCS = {
-  "rapport_strategique.docx":"docs/rapport.html","rapport_strategique.pdf":"docs/rapport.html",
-  "plan_initiatives.xlsx":"docs/plan.html","presentation.pptx":"docs/presentation.html","presentation.pdf":"docs/presentation.html"
-};
-function etat(){try{return JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){return {}}}
-function sauver(e){localStorage.setItem(LS, JSON.stringify(e))}
-function normq(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g," ")}
-function matchQA(q){
-  const n=normq(q); let best=null, sc=0;
-  for(const a of QA){const k=a.keys.filter(x=>n.includes(normq(x))).length; if(k>sc){sc=k;best=a}}
-  if(sc>=1) return {...best, revue:{ok:true}, escalade:false, cout_usd:0, skill:best.skill};
-  return {reponse:"Dans cette démo, les réponses sont celles déjà vérifiées par les moteurs sur l'entreprise fictive. Essayez l'une des questions proposées sous le champ.", revue:{ok:true}, modele:"déterministe (démo)", outils:[], skill:null, escalade:false, cout_usd:0};
-}
-function appliquer(){
-  const e=etat(); const d=structuredClone(DEMO);
-  if(e.actions){const map={}; e.actions.forEach(a=>map[a.id]=a.statut); d.actions=d.actions.map(a=>map[a.id]?{...a,statut:map[a.id]}:a)}
-  if(e.taches) d.usage={...d.usage, taches:e.taches};
-  if(e.conversations) d.conversations=e.conversations;
-  if(e.connectes){d.connecteurs=d.connecteurs.map(c=>e.connectes[c.id]?{...c,connecte:true}:c)}
-  if(e.routine) d.usage={...d.usage};
-  const dec=e.decisions||{};
-  if(d.copilote&&d.copilote.actions){
-    d.copilote.actions=d.copilote.actions.filter(a=>{
-      const v=dec[a.id];
-      if(v==="activee" && a.kind==="valider") return false;
-      if(v==="activee" && (a.kind==="automatiser"||a.kind==="prioriser"||a.kind==="activer_skill")) return false;
-      if(v==="activee" && a.kind==="valider") return false;
-      return true;
-    }).map(a=>{
-      if(dec[a.id]==="plus_tard") return {...a, reporté:true, score:(a.score||1)*0.06};
-      if(dec[a.id]==="activee" && a.kind==="connecter") return {...a, verbe:"Importer un export", pourquoi:a.pourquoi+" Dans la démo, l'import de fichier est le chemin disponible."};
-      return a;
-    }).sort((x,y)=> (y.score||0)-(x.score||0) || x.id.localeCompare(y.id));
-  }
-  d._hist=d.historique_ventes||[];
-  return d;
-}
+const fmt=(v,d=0)=>v==null||v===""||Number.isNaN(Number(v))?"—":Number(v).toLocaleString("fr-FR",{maximumFractionDigits:d,minimumFractionDigits:d});
+const eur=v=>v==null?"—":fmt(v)+" €";
+const eurc=v=>v==null?"—":Math.abs(v)>=1e6?fmt(v/1e6,2)+" M€":Math.abs(v)>=1e5?fmt(v/1e3,0)+" k€":eur(v);
+const pct=v=>v==null?"—":fmt(v*100,1)+" %";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const lab=id=>String(id||"").replace(/^agent_/,"").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
+function toast(m){const t=$("#toast"); if(!t) return; t.textContent=m; t.style.display="block"; clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.display="none",3200)}
 async function api(p,o={}){
-  const body=typeof o.body==="string" && o.body ? JSON.parse(o.body) : (o.body||{});
-  const e=etat();
-  if(p.endsWith("/dashboard") || p.endsWith("/copilote") && !p.includes("/activer") && !p.includes("/plus-tard")){
-    const d=appliquer();
-    if(p.endsWith("/copilote")) return d.copilote;
-    return d;
-  }
-  const mCop=p.match(/\/copilote\/([^/]+)\/(activer|plus-tard)/);
-  if(mCop){
-    const [_,id,verb]=mCop;
-    const d=appliquer();
-    const a=(d.copilote.actions||[]).find(x=>x.id===id);
-    e.decisions=e.decisions||{};
-    if(verb==="plus-tard"){ e.decisions[id]="plus_tard"; sauver(e); return {id, statut:"plus_tard", message:"Très bien, je la remettrai plus bas et je vous proposerai autre chose."} }
-    if(!a) return {statut:"inconnue", id};
-    e.decisions[id]="activee";
-    if(a.kind==="valider"){
-      const aid=+(a.deblocage&&a.deblocage.action_id || a.cible);
-      e.actions=e.actions||d.actions.map(x=>({id:x.id,statut:x.statut}));
-      e.actions=e.actions.map(x=>x.id==aid?{...x,statut:"approuvee"}:x);
-      if(!e.actions.some(x=>x.id==aid)) e.actions.push({id:aid,statut:"approuvee"});
-      sauver(e);
-      return {id, kind:a.kind, statut:"validee", action:aid, message:"Validé. Dans l'espace client, l'exécution passe par le connecteur — rien n'est envoyé automatiquement."};
-    }
-    if(a.kind==="connecter"||a.kind==="importer"){
-      sauver(e);
-      return {id, kind:a.kind, statut:"ouvrir_import", message:a.kind==="connecter"?"Démo : la connexion continue sera disponible dans l'espace client. En attendant, déposez un export — ça fonctionne déjà.":"Déposez un FEC, des factures ou un relevé (CSV, XLSX) : dans l'espace client, le jumeau se reconfigure."};
-    }
-    if(a.kind==="prioriser"){ sauver(e); return {id, statut:"priorisee", vue:"initiatives", message:"Initiative placée en tête de suivi."} }
-    if(a.kind==="automatiser"){ e.routine=true; sauver(e); return {id, statut:"routine_activee", message:"Veille quotidienne activée dans cette démo. Aucun envoi automatique."} }
-    if(a.kind==="activer_skill"){ sauver(e); return {id, statut:"skill_active", message:"Skill activé. Il sera rejoué dès la prochaine question correspondante."} }
-    sauver(e); return {id, statut:"ok", message:"C'est noté."};
-  }
-  if(p.includes("/chat") && (o.method||"GET").toUpperCase()==="POST"){
-    const r=matchQA(body.message||"");
-    const d=appliquer();
-    e.taches=(e.taches??d.usage.taches)+1;
-    const conv=(e.conversations||d.conversations).concat([
-      {tache:body.message, resultat:r.reponse, ok:1, modele:r.modele, skill:r.skill, cout:r.cout_usd, ts:Date.now()/1000, agent:"agent"}
-    ]);
-    e.conversations=conv.slice(-30);
-    sauver(e);
-    return {reponse:r.reponse, revue:r.revue, modele:r.modele, escalade:r.escalade, skill:r.skill, outils:r.outils||[], cout_usd:r.cout_usd};
-  }
-  if(/\/actions\/\d+/.test(p) && (o.method||"").toUpperCase()==="POST"){
-    const aid=+(p.match(/\/actions\/(\d+)/)[1]);
-    const d=appliquer();
-    e.actions=e.actions||d.actions.map(x=>({id:x.id,statut:x.statut}));
-    const st=body.approuve?"approuvee":"refusee";
-    e.actions=e.actions.map(x=>x.id==aid?{...x,statut:st}:x);
-    if(!e.actions.some(x=>x.id==aid)) e.actions.push({id:aid,statut:st});
-    e.decisions=e.decisions||{};
-    (d.copilote.actions||[]).forEach(a=>{ if(a.kind==="valider" && String(a.deblocage&&a.deblocage.action_id||a.cible)===String(aid)) e.decisions[a.id]="activee"; });
-    sauver(e);
-    return {action:aid, approuve:!!body.approuve};
-  }
-  throw new Error("inaccessible en démo");
+  if(window.exiorDemoApi) return window.exiorDemoApi(p,o);
+  const r=await fetch(p,{...o,headers:{"Authorization":"Bearer "+S.k,"Content-Type":"application/json",...(o.headers||{})}});
+  if(!r.ok) throw new Error(r.status);
+  return r.headers.get("content-type")?.includes("json")?r.json():r.blob();
 }
-
 const I={
- tableau:'<path d="M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z"/>',
- conversation:'<path d="M4 4h16v12H7l-3 3z"/>',
- initiatives:'<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>',
- agents:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>',
- validations:'<path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="4"/>',
- documents:'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/>',
- connecteurs:'<path d="M9 7V3M15 7V3M7 7h10v5a5 5 0 01-10 0zM12 17v4"/>',
- metasysteme:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/>',
- reglages:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>'};
-const NAV=[["tableau","Tableau de bord"],["conversation","Conversation"],["initiatives","Initiatives"],["agents","Agents"],["validations","Validations"],["documents","Documents"],["connecteurs","Connecteurs"],["metasysteme","Métasystème"],["reglages","Réglages & offre"]];
-const ico=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
+ tableau:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+ conversation:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ initiatives:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+ agents:'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>',
+ validations:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+ documents:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
+ connecteurs:'<path d="M12 22v-5M9 8V2M15 8V2M18 8v5a6 6 0 0 1-12 0V8z"/>',
+ metasysteme:'<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+ reglages:'<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+ search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+ moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+ menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+ send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+ download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+ upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+ chart:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+ package:'<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12M3.3 7 12 12l8.7-5"/>',
+ message:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>'
+};
+const NAV=[
+ ["tableau","Tableau de bord","T"],
+ ["conversation","Conversation","C"],
+ ["initiatives","Initiatives","I"],
+ ["agents","Agents","A"],
+ ["validations","Validations","V"],
+ ["documents","Documents","D"],
+ ["connecteurs","Connecteurs","O"],
+ ["metasysteme","Métasystème","M"],
+ ["reglages","Réglages & offre","R"]
+];
+const GO=Object.fromEntries(NAV.map(([id,,k])=>[k.toLowerCase(),id]));
+const ico=k=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]||""}</svg>`;
+const ACT_ICO={relance_impaye:"mail", reallocation_budget_pub:"chart", brouillon_reappro:"package", brouillon_reponse:"message"};
 
-function line(hist,prev,ic){ // SVG ligne historique + prévision + intervalle
- const W=640,H=210,P=30,all=[...hist,...prev,...ic.flat()],mx=Math.max(...all)*1.05,mn=Math.min(...all)*.9,n=hist.length+prev.length;
- const x=i=>P+(W-2*P)*i/(n-1),y=v=>H-P-(H-2*P)*(v-mn)/(mx-mn);
- const hp=hist.map((v,i)=>`${i?"L":"M"}${x(i)},${y(v)}`).join(""),o=hist.length-1;
- const pp=`M${x(o)},${y(hist[o])}`+prev.map((v,i)=>`L${x(o+1+i)},${y(v)}`).join("");
- const band=`M${x(o)},${y(hist[o])}`+ic.map((v,i)=>`L${x(o+1+i)},${y(v[1])}`).join("")+ic.map((v,i)=>[i,v]).reverse().map(([i,v])=>`L${x(o+1+i)},${y(v[0])}`).join("")+"Z";
- let g="";for(let k=0;k<4;k++){const v=mn+(mx-mn)*k/3;g+=`<line x1="${P}" x2="${W-P}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(167,139,250,.08)"/><text x="2" y="${y(v)+3}">${fmt(v/1000)}k</text>`}
- return `<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="gl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".45"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient></defs>${g}
- <path d="${hp}L${x(o)},${H-P}L${x(0)},${H-P}Z" fill="url(#gl)"/><path d="${hp}" stroke="#a78bfa" stroke-width="2.2" fill="none"/>
- <path d="${band}" fill="rgba(196,181,253,.16)"/><path d="${pp}" stroke="#e9d5ff" stroke-width="2.2" stroke-dasharray="5 4" fill="none"/>
- <circle cx="${x(o)}" cy="${y(hist[o])}" r="4" fill="#fff" stroke="#8b5cf6" stroke-width="2"/></svg>`}
-function bars(items,max){max=max||Math.max(...items.map(i=>Math.max(i.a,i.b||0)))||1;
- return items.map(i=>`<div style="margin:9px 0"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${esc(i.l)}</span><span class="muted">${i.t}</span></div>
- <div style="height:8px;border-radius:6px;background:rgba(167,139,250,.1);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:${100*i.a/max}%;background:${i.c||"linear-gradient(90deg,#7c3aed,#a78bfa)"}"></i></div>
- ${i.b!=null?`<div style="height:8px;border-radius:6px;background:rgba(167,139,250,.06);margin-top:3px;overflow:hidden"><i style="display:block;height:100%;width:${100*i.b/max}%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></i></div>`:""}</div>`).join("")}
+function histOf(d){
+  if(Array.isArray(d._hist)&&d._hist.length) return d._hist;
+  if(Array.isArray(d.historique_ventes)&&d.historique_ventes.length) return d.historique_ventes;
+  const h=d.prevision_ventes&&d.prevision_ventes.historique;
+  if(h&&typeof h==="object") return Object.values(h);
+  return [];
+}
+function line(hist,prev,ic){
+  hist=hist||[]; prev=prev||[]; ic=ic||[];
+  if(hist.length<1||!prev.length) return '<p class="empty">Données insuffisantes</p>';
+  const W=720,H=220,PL=46,PR=8,PT=12,PB=18;
+  const all=[...hist,...prev,...ic.flat()];
+  let mx=Math.max(...all), mn=Math.min(...all);
+  if(!(mx>mn)){mx+=1; mn-=1}
+  const pad=(mx-mn)*0.08; mx+=pad; mn=Math.max(0,mn-pad);
+  const n=hist.length+prev.length;
+  const x=i=>PL+(W-PL-PR)*i/Math.max(1,n-1);
+  const y=v=>PT+(H-PT-PB)*(1-(v-mn)/(mx-mn));
+  const hp=hist.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const o=hist.length-1;
+  const pp=`M${x(o).toFixed(1)},${y(hist[o]).toFixed(1)} `+prev.map((v,i)=>`L${x(o+1+i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  let band="";
+  if(ic.length){
+    const up=ic.map((v,i)=>`L${x(o+1+i).toFixed(1)},${y(v[1]).toFixed(1)}`).join(" ");
+    const dn=[...ic].map((v,i)=>[i,v]).reverse().map(([i,v])=>`L${x(o+1+i).toFixed(1)},${y(v[0]).toFixed(1)}`).join(" ");
+    band=`<path d="M${x(o).toFixed(1)},${y(hist[o]).toFixed(1)} ${up} ${dn} Z" class="band"/>`;
+  }
+  let g="";
+  for(let k=0;k<4;k++){
+    const v=mn+(mx-mn)*k/3, yy=y(v).toFixed(1);
+    g+=`<line class="gridl" x1="${PL}" x2="${W-PR}" y1="${yy}" y2="${yy}"/><text x="${PL-6}" y="${Number(yy)+3}" text-anchor="end">${fmt(v/1000)}k</text>`;
+  }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Prévision des ventes">${g}${band}<path d="${hp}" class="hist"/><path d="${pp}" class="fore"/><circle class="now" cx="${x(o).toFixed(1)}" cy="${y(hist[o]).toFixed(1)}" r="3.5"/></svg>`;
+}
+function bars(items){
+  const max=Math.max(...items.map(i=>Math.max(i.a||0,i.b||0)),1);
+  return items.map(i=>`<div class="bar-row"><div class="bar-top"><span>${esc(i.l)}</span><span class="muted">${i.t}</span></div>
+    <div class="track"><i class="${i.tone||""}" style="width:${Math.max(0,Math.min(100,100*(i.a||0)/max))}%"></i></div>
+    ${i.b!=null?`<div class="track alt"><i style="width:${Math.max(0,Math.min(100,100*i.b/max))}%"></i></div>`:""}</div>`).join("");
+}
+function ageLabel(l){
+  if(l==="non_echu") return "Non échu";
+  if(l==="plus_90") return "> 90 j";
+  return String(l).replace("_"," – ")+" j";
+}
+function head(title,text){return `<header class="pagehead"><h2>${title}</h2>${text?`<p>${text}</p>`:""}</header>`}
+function statusPill(ok,label){return `<span class="status ${ok}"><span class="dot"></span>${label}</span>`}
 
 const V={
-tableau(d){const k=d.kpis,pv=d.prevision_ventes,e=d.encours,b=d.budget_pub;
- const hist=Object.values(pv.historique||{}).slice?.(-14)||[];
- return `${nba(d)}
- <div class="sec-t"><h2>Bonjour 👋</h2><p>Voici votre entreprise, calculée en continu par vos agents — chaque chiffre vient d'un moteur.</p></div>
- <div class="grid g6">
- ${[["Produits (exercice)",eurc(k.produits),"FEC — comptes 7"],["Résultat",eurc(k.resultat),"marge nette "+pct(k.taux_marge_nette)],["Encours clients",eurc(k.encours_total),fmt(e.top_debiteurs?.length)+" débiteurs suivis"],
-   ["Échu > 60 jours",eur(k.echu_plus_60j),"relances prêtes"],["Clients facturés",fmt(k.nb_clients),"1er client : "+pct(k.part_top1)],["Gain pub modélisé",eur(b.gain_estime),"à budget constant"]]
-   .map(([l,v,s])=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("")}
- </div>
- <div class="grid g2" style="margin-top:16px">
-  <div class="card hl"><h3>Prévision des ventes <span class="pill">${esc(pv.methode||pv.modele||"")}</span></h3>${pv.prevision?line(d._hist,pv.prevision,pv.intervalle_80||pv.ic80):'<p class="muted">Données insuffisantes</p>'}
-   <div class="legend"><span><i style="background:#a78bfa"></i>Historique</span><span><i style="background:#e9d5ff"></i>Prévision 6 mois</span><span><i style="background:rgba(196,181,253,.3)"></i>Intervalle 80 %</span></div></div>
-  <div class="card"><h3>Synthèse stratégique <span class="pill ok"><span class="dot"></span>Vérifiée</span></h3><div style="white-space:pre-wrap;color:var(--t2);font-size:13px;max-height:250px;overflow:auto">${esc(d.synthese)}</div></div>
- </div>
- <div class="grid g3" style="margin-top:16px">
-  <div class="card"><h3>Balance âgée des créances</h3>${bars(Object.entries(e.balance_agee||{}).map(([l,v])=>({l:l.replace("_"," – ").replace("plus – ","> ")+(l=="non_echu"?"":" j"),a:v,t:eur(v),c:l.includes("90")||l.includes("61")?"linear-gradient(90deg,#dc2626,#f87171)":undefined})))}</div>
-  <div class="card"><h3>Budget publicitaire <span class="pill">HiGHS</span></h3>${b.repartition_actuelle?bars(Object.keys(b.repartition_actuelle).map(c=>({l:c.replace("_"," "),a:b.repartition_actuelle[c],b:b.allocation_optimale[c],t:eur(b.repartition_actuelle[c])+" → "+eur(b.allocation_optimale[c])}))):""}
-   <div class="legend"><span><i style="background:#8b5cf6"></i>Actuel</span><span><i style="background:#34d399"></i>Optimal</span></div></div>
-  <div class="card"><h3>Jumeau numérique</h3><div class="chips">${Object.entries(d.jumeau).map(([t,n])=>`<span class="chip">${t} · ${fmt(n)}</span>`).join("")}</div>
-   <h3 style="margin-top:18px">Veille du jour</h3>${(d.genesis.veille||[]).length?(d.genesis.veille||[]).map(v=>`<div class="small" style="margin:6px 0"><b>${esc(v.source)}</b> <span class="muted">${esc((v.derniers_avis||[]).slice(0,1).join("")||v.eur_usd||v.http||"")}</span></div>`).join(""):'<p class="small muted">CERT-FR, BCE et sources sectorielles — relevé quotidien.</p>'}
-   <h3 style="margin-top:18px">Stocks</h3><div class="small">${fmt(d.stocks.sous_seuil)} références sous le seuil sur ${fmt(d.stocks.references)}</div></div>
- </div>`},
-conversation(d){const c=d.conversations||[];
- return `<div class="chat"><div class="thread"><div class="msgs" id="msgs">${c.map(e=>`<div class="m u">${esc(e.tache)}</div><div class="m a">${esc(e.resultat)}<div class="meta"><span class="chip ${e.ok?"g":""}">${e.ok?"✓ vérifié par le réviseur":"bloqué par le réviseur"}</span><span class="chip">${esc(e.modele)}</span>${e.skill?`<span class="chip">skill appris</span>`:""}<span>${fmt(e.cout*0.92,4)} €</span></div></div>`).join("")||'<p class="muted">Posez votre première question.</p>'}</div>
-  <div class="sugg">${["Quelle est notre trésorerie prévisionnelle ?","Qui relancer en priorité ?","Où mettre le budget pub ce mois-ci ?","Quels produits risquent la rupture ?","Quel est le risque sur le résultat ?"].map(s=>`<span onclick="ask(this.textContent)">${s}</span>`).join("")}</div>
-  <div class="composer"><textarea id="q" placeholder="Demandez n'importe quoi à votre Meta OS… (Entrée pour envoyer)" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();ask()}"></textarea><button class="btn" onclick="ask()">Envoyer ➤</button></div></div>
-  <div class="card"><h3>Comment je réponds</h3><div class="small muted" style="line-height:1.7">1. Je cherche d'abord un <b style="color:#fff">skill déjà appris</b>.<br>2. Je délègue à l'agent spécialisé.<br>3. Les <b style="color:#fff">moteurs calculent</b> (HiGHS, CP-SAT, bayésien, Monte Carlo, Holt-Winters).<br>4. Le <b style="color:#fff">réviseur</b> vérifie chaque chiffre.<br>5. Modèle économique par défaut, modèle fort seulement si le réviseur le demande.<br>6. Tout engagement reste un <b style="color:#fff">brouillon à valider</b>.</div>
-  <h3 style="margin-top:18px">Ce mois-ci</h3><div class="small">${fmt(d.usage.taches)} tâches sur ${fmt(d.usage.incluses)} incluses</div></div></div>`},
-initiatives(d){const sel=new Set(d.portefeuille.selection||[]);
- return `<div class="sec-t"><h2>Initiatives</h2><p>Générées depuis votre jumeau, valorisées et sélectionnées par optimisation (OR-Tools CP-SAT).</p></div>
- <div class="grid g3"><div class="card kpi hl"><div class="l">Valeur du portefeuille retenu</div><div class="v">${eur(d.portefeuille.valeur_totale)}<span class="small muted"> /an</span></div><div class="s">ajustée du risque · ${esc(d.portefeuille.statut||"")}</div></div>
- <div class="card kpi"><div class="l">Initiatives retenues</div><div class="v">${sel.size} / ${d.initiatives.length}</div><div class="s">budget et capacité respectés</div></div>
- <div class="card kpi"><div class="l">Connecteurs à ajouter</div><div class="v">${(d.architecture.connecteurs_a_ajouter||[]).length}</div><div class="s">${esc((d.architecture.connecteurs_a_ajouter||[]).join(", "))}</div></div>
- </div>
- <div class="card" style="margin-top:16px"><table><tr><th>Initiative</th><th class="num">Gain brut/an</th><th class="num">Probabilité</th><th class="num">Risque</th><th class="num">Valeur ajustée</th><th>Agents</th><th></th></tr>
- ${d.initiatives.map(i=>`<tr><td><b>${esc(i.titre)}</b><div class="small muted">${esc(i.base_calcul)}</div></td><td class="num">${eur(i.gain_annuel_brut)}</td><td class="num">${pct(i.probabilite_succes)}</td><td class="num">${pct(i.risque)}</td><td class="num"><b>${eur(i.valeur_ajustee_risque)}</b></td><td><div class="chips">${i.agents.map(a=>`<span class="chip">${lab(a)}</span>`).join("")}</div></td><td>${sel.has(i.id)?'<span class="pill ok">Retenue</span>':'<span class="pill">En réserve</span>'}</td></tr>`).join("")}</table>
- <p class="small muted" style="margin-top:12px">${esc(d.hypotheses.note||"")}</p></div>`},
-agents(d){return `<div class="sec-t"><h2>Vos agents</h2><p>Créés automatiquement pour votre secteur (${esc(d.genesis.famille)} · ${esc(d.genesis.methode_secteur)}), testés et attaqués avant activation.</p></div>
- <div class="grid g4">${d.agents.map(a=>{const on=a.statut=="actif";return `<div class="card agent ${on?"":""}"><div class="hd"><div class="av">${lab(a.id).slice(0,2).toUpperCase()}</div><div><div class="nm">${lab(a.id)}</div><span class="pill ${on?"ok":"warn"}"><span class="dot"></span>${on?"Actif":"Bloqué par la porte"}</span></div></div>
- <div class="ms">${esc(a.mission)}</div>
- <div class="chips">${(a.objets_lecture||[]).slice(0,4).map(o=>`<span class="chip">${o=="*"?"tout (orchestration)":o}</span>`).join("")}</div>
- <div class="small muted">${a.expertise?`Expertise vérifiée${a.expertise.cache?" · bibliothèque":""}`:"Noyau du métasystème"}</div>
- <div class="small muted">${a.brouillons?"✎ brouillons à valider":"lecture seule"} · ${a.habilitation_pii?"données personnelles habilitées":"sans données personnelles"} · paiement : jamais</div></div>`}).join("")}</div>`},
-validations(d){const P=d.actions.filter(a=>a.statut=="a_valider"),H=d.actions.filter(a=>a.statut!="a_valider");
- const icn={relance_impaye:"✉️",reallocation_budget_pub:"📊",brouillon_reappro:"📦",brouillon_reponse:"💬"};
- return `<div class="sec-t"><h2>Validations</h2><p>Rien d'engageant ne part sans vous. Un clic pour valider, un clic pour refuser.</p></div>
- ${P.map(a=>{const x=JSON.parse(a.apres||"{}");return `<div class="card" style="margin-bottom:12px"><div class="act"><div class="ic">${icn[a.action]||"⚡"}</div>
- <div><b>${esc(lab(a.action))}</b> <span class="muted">· ${esc(a.cible)}</span><div class="small muted">proposé par ${lab(a.acteur)} · ${new Date(a.ts*1000).toLocaleString("fr-FR")}</div>
- ${detail(a.action,x)}</div>
- <div style="display:flex;flex-direction:column;gap:8px"><button class="btn okb sm" onclick="decide(${a.id},true)">✓ Valider</button><button class="btn no sm" onclick="decide(${a.id},false)">Refuser</button></div></div></div>`}).join("")||'<div class="card"><p class="muted">Aucune validation en attente. 🎉</p></div>'}
- ${H.length?`<h3 class="muted" style="margin-top:22px">Historique</h3><div class="card"><table>${H.map(a=>`<tr><td>${esc(lab(a.action))}</td><td class="muted">${esc(a.cible)}</td><td><span class="pill ${a.statut=="approuvee"?"ok":"bad"}">${a.statut}</span></td></tr>`).join("")}</table></div>`:""}`},
-documents(d){return `<div class="sec-t"><h2>Documents</h2><p>Produits par votre suite bureautique intégrée (Word, Excel avec formules, PowerPoint, PDF).</p></div>
- <div class="grid g3">${d.documents.map(f=>`<div class="card doc"><div class="ft ${f.type}">${f.type.toUpperCase()}</div><div style="flex:1"><b>${esc(f.nom)}</b><div class="small muted">${fmt(f.taille_ko,1)} Ko</div></div><button class="btn ghost sm" onclick="dl('${esc(f.nom)}')">Télécharger</button></div>`).join("")||'<p class="muted">Aucun document.</p>'}</div>`},
-connecteurs(d){return `<div class="sec-t"><h2>Connecteurs</h2><p>Détectés depuis vos outils. Déposez vos exports pour démarrer tout de suite ; connectez vos comptes pour la synchronisation continue.</p></div>
- <div class="drop" onclick="document.getElementById('f').click()"><div style="font-size:28px">⇪</div><b>Déposez un FEC, des factures, des ventes (CSV, XLSX)</b><div class="small muted">Reconnu automatiquement et ajouté à votre jumeau — puis vos agents se reconfigurent.</div><input type="file" id="f" style="display:none" onchange="up(this.files[0])"></div>
- <div class="grid g3" style="margin-top:16px">${d.connecteurs.map(c=>`<div class="card"><h3 style="color:#fff;font-size:14px">${esc(lab(c.id))}<span class="pill ${c.connecte?"ok":""}">${c.connecte?"<span class='dot'></span>Actif":esc(c.auth)}</span></h3>
- <div class="small muted">${esc(c.categorie)}${c.serveur_mcp?" · serveur MCP : "+esc(c.serveur_mcp):""}</div>
- <div class="chips" style="margin:10px 0">${c.outils.map(o=>`<span class="chip">${esc(o)}</span>`).join("")}</div>
- ${c.connecte?"":`<button class="btn sm" onclick="conn('${c.id}')">Connecter</button>`}</div>`).join("")}</div>`},
-metasysteme(d){const g=d.genesis;return `<div class="sec-t"><h2>Métasystème</h2><p>La couche de contrôle qui a créé, testé et activé vos agents — et qui continue de les faire progresser.</p></div>
- <div class="grid g4">${[["Onboarding complet",fmt(g.duree_totale_s,2)+" s",fmt(g.cout_total_usd*0.92,3)+" € de calcul IA"],["Politiques d'accès","Conformes","refus par défaut, forbid prioritaire"],["Actions interdites forcées","Bloquées","modèle supposé compromis"],["Tests d'attaque","Validés","aucune action interdite exécutée"]]
-  .map(([l,v,s])=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("")}</div>
- <div class="grid g22" style="margin-top:16px"><div class="card"><h3>Genesis — étapes chronométrées</h3><div class="steps">${(g.etapes||[]).map(s=>`<div class="step"><i></i><span>${esc(s.etape)}</span><span class="muted">${fmt(s.duree_s,2)} s</span><span class="muted">${fmt(s.cout_usd*0.92,4)} €</span></div>`).join("")}</div></div>
- <div class="card hl"><h3>Volant d'inertie (bibliothèque partagée)</h3><p class="small muted">Chaque onboarding publie des modèles anonymisés (jamais de données client) : packs d'expertise, prompts, connecteurs, politiques, skills. L'entreprise suivante démarre plus vite et pour moins cher.</p>
- <div class="chips">${Object.entries(d.bibliotheque.elements||{}).map(([k,n])=>`<span class="chip">${k} · ${n}</span>`).join("")}</div>
- <div class="grid g22" style="margin-top:14px"><div class="kpi"><div class="l">Réutilisations</div><div class="v">${fmt(d.bibliotheque.reutilisations)}</div></div><div class="kpi"><div class="l">IA économisée</div><div class="v">${fmt(d.bibliotheque.economie_ia_usd*0.92,3)} €</div></div></div>
- <h3 style="margin-top:16px">Journal d'audit</h3><span class="pill ${d.audit.ok?"ok":"bad"}"><span class="dot"></span>${d.audit.ok?"Chaîne intègre":"Rupture détectée"} · ${fmt(d.audit.entrees)} entrées</span></div></div>`},
-reglages(d){const cur=d.tenant.plan;return `<div class="sec-t"><h2>Réglages & offre</h2><p>Abonnement + usage. Aucun frais de mise en place.</p></div>
- <div class="grid g3">${Object.entries(d.plans).map(([k,p])=>`<div class="card plan ${k==cur?"cur":""}"><div class="pill">${k==cur?"Votre offre":"Offre"}</div><h3 style="justify-content:center;color:#fff;font-size:16px;margin-top:10px">${k[0].toUpperCase()+k.slice(1)}</h3><div class="p">${fmt(p.prix_mois_eur)} €<span class="small muted"> HT/mois</span></div><div class="muted small">${fmt(p.taches_incluses)} tâches incluses · 0 € de mise en place</div></div>`).join("")}</div>
- <div class="grid g22" style="margin-top:16px"><div class="card"><h3>Consommation du mois</h3><div class="kpi"><div class="v">${fmt(d.usage.taches)} <span class="small muted">/ ${fmt(d.usage.incluses)} tâches</span></div></div><div class="meter" style="width:100%;margin-top:10px"><div class="bar"><i style="width:${Math.min(100,100*d.usage.taches/d.usage.incluses)}%"></i></div></div><p class="small muted">Tâche supplémentaire : 0,90 € HT · supplément à ce jour : ${eur(d.usage.a_facturer_sup_eur)}</p></div>
- <div class="card"><h3>Sécurité</h3><div class="small" style="line-height:1.9">✓ Données, mémoire, coffre et journal isolés pour votre entreprise<br>✓ Secrets chiffrés, jamais visibles des agents<br>✓ Aucun paiement par un agent, jamais<br>✓ Envois et écritures uniquement après votre validation<br>✓ Journal d'audit chaîné et vérifiable</div></div></div>`}
+tableau(d){
+  const k=d.kpis||{}, pv=d.prevision_ventes||{}, e=d.encours||{}, b=d.budget_pub||{};
+  const hist=histOf(d), ic=pv.intervalle_80||pv.ic80||[];
+  const kpis=[
+    ["Produits (exercice)",eurc(k.produits),"FEC — comptes 7"],
+    ["Résultat",eurc(k.resultat),"marge nette "+pct(k.taux_marge_nette)],
+    ["Encours clients",eurc(k.encours_total),fmt((e.top_debiteurs||[]).length)+" débiteurs suivis"],
+    ["Échu > 60 jours",eur(k.echu_plus_60j),"relances prêtes"],
+    ["Clients facturés",fmt(k.nb_clients),"1er client : "+pct(k.part_top1)],
+    ["Gain pub modélisé",eur(b.gain_estime),"à budget constant"]
+  ];
+  const aged=Object.entries(e.balance_agee||{}).map(([l,v])=>({l:ageLabel(l), a:v, t:eur(v), tone:/61|90|plus/.test(l)?"bad":""}));
+  const budget=b.repartition_actuelle?Object.keys(b.repartition_actuelle).map(c=>({
+    l:c.replaceAll("_"," "), a:b.repartition_actuelle[c], b:(b.allocation_optimale||{})[c],
+    t:eur(b.repartition_actuelle[c])+" → "+eur((b.allocation_optimale||{})[c])
+  })):[];
+  return `${head("Bonjour","Voici votre entreprise, calculée en continu par vos agents — chaque chiffre vient d'un moteur.")}
+  ${nba(d)}
+  <section class="panel metrics" aria-label="Indicateurs">${kpis.map(([l,v,s])=>`<div class="metric"><div class="k">${l}</div><div class="n">${v}</div><div class="s">${s}</div></div>`).join("")}</section>
+  <div class="split" style="margin-top:12px">
+    <section class="panel"><div class="panel-h"><h3>Prévision des ventes</h3><span class="chip" style="margin-left:auto">${esc(pv.methode||pv.modele||"")}</span></div>
+      ${pv.prevision?line(hist,pv.prevision,ic):'<p class="empty">Données insuffisantes</p>'}
+      <div class="legend"><span><i class="sw"></i>Historique</span><span><i class="sw dash"></i>Prévision 6 mois</span><span><i class="sw band"></i>Intervalle 80 %</span></div>
+    </section>
+    <section class="panel"><div class="panel-h"><h3>Synthèse stratégique</h3>${statusPill("ok","Vérifiée")}</div><div class="pre">${esc(d.synthese||"")}</div></section>
+  </div>
+  <div class="cols-3" style="margin-top:12px">
+    <section class="panel"><h3 class="panel-h">Balance âgée des créances</h3>${aged.length?bars(aged):'<p class="empty">Aucune créance.</p>'}
+      <div class="legend"><span><i class="sw"></i>Encours</span><span><i class="sw bad"></i>Échu &gt; 60 jours</span></div></section>
+    <section class="panel"><div class="panel-h"><h3>Budget publicitaire</h3><span class="chip">HiGHS</span></div>${budget.length?bars(budget):'<p class="empty">Pas de budget.</p>'}
+      <div class="legend"><span><i class="sw"></i>Actuel</span><span><i class="sw soft"></i>Optimal</span></div></section>
+    <section class="panel"><h3 class="panel-h">Jumeau numérique</h3><div class="chips">${Object.entries(d.jumeau||{}).map(([t,n])=>`<span class="chip">${esc(t)} · ${fmt(n)}</span>`).join("")||'<span class="muted">Vide</span>'}</div>
+      <h3 class="panel-h" style="margin-top:16px">Veille du jour</h3>
+      ${(d.genesis&&d.genesis.veille||[]).length?(d.genesis.veille||[]).map(v=>`<div class="small" style="margin:6px 0"><b>${esc(v.source)}</b> <span class="muted">${esc((v.derniers_avis||[]).slice(0,1).join("")||v.eur_usd||v.http||"")}</span></div>`).join(""):'<p class="small muted">CERT-FR, BCE et sources sectorielles — relevé quotidien.</p>'}
+      <h3 class="panel-h" style="margin-top:16px">Stocks</h3><p class="small" style="margin:0">${fmt(d.stocks&&d.stocks.sous_seuil)} références sous le seuil sur ${fmt(d.stocks&&d.stocks.references)}</p>
+    </section>
+  </div>`;
+},
+conversation(d){
+  const c=d.conversations||[];
+  const sugg=["Quelle est notre trésorerie prévisionnelle ?","Qui relancer en priorité ?","Où mettre le budget pub ce mois-ci ?","Quels produits risquent la rupture ?","Quel est le risque sur le résultat ?"];
+  return `<div class="chat"><div class="thread">
+    <div class="msgs" id="msgs">${c.map(e=>`<div class="m u">${esc(e.tache)}</div><div class="m a">${esc(e.resultat)}<div class="meta">${chipOk(e.ok)}<span class="chip">${esc(e.modele)}</span>${e.skill?'<span class="chip">skill appris</span>':""}<span class="chip">${fmt(e.cout*0.92,4)} €</span></div></div>`).join("")||'<p class="empty">Posez votre première question.</p>'}</div>
+    <div class="sugg">${sugg.map(s=>`<button type="button" onclick="ask(this.textContent)">${esc(s)}</button>`).join("")}</div>
+    <div class="composer"><textarea id="q" placeholder="Demandez n'importe quoi à votre Meta OS… (Entrée pour envoyer)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask()}"></textarea><button class="btn" onclick="ask()">Envoyer ${ico("send")}</button></div>
+  </div>
+  <aside class="panel"><h3 class="panel-h">Comment je réponds</h3>
+    <ol class="small muted" style="margin:0;padding-left:18px;line-height:1.7">
+      <li>Je cherche d'abord un <b style="color:var(--text)">skill déjà appris</b>.</li>
+      <li>Je délègue à l'agent spécialisé.</li>
+      <li>Les <b style="color:var(--text)">moteurs calculent</b> (HiGHS, CP-SAT, bayésien, Monte Carlo, Holt-Winters).</li>
+      <li>Le <b style="color:var(--text)">réviseur</b> vérifie chaque chiffre.</li>
+      <li>Modèle économique par défaut, modèle fort seulement si le réviseur le demande.</li>
+      <li>Tout engagement reste un <b style="color:var(--text)">brouillon à valider</b>.</li>
+    </ol>
+    <h3 class="panel-h" style="margin-top:16px">Ce mois-ci</h3>
+    <p class="small" style="margin:0">${fmt(d.usage&&d.usage.taches)} tâches sur ${fmt(d.usage&&d.usage.incluses)} incluses</p>
+  </aside></div>`;
+},
+initiatives(d){
+  const sel=new Set((d.portefeuille&&d.portefeuille.selection)||[]);
+  const arch=d.architecture||{};
+  return `${head("Initiatives","Générées depuis votre jumeau, valorisées et sélectionnées par optimisation (OR-Tools CP-SAT).")}
+  <section class="panel metrics m4" aria-label="Portefeuille">
+    <div class="metric"><div class="k">Valeur du portefeuille retenu</div><div class="n">${eur(d.portefeuille&&d.portefeuille.valeur_totale)}<span class="small muted"> /an</span></div><div class="s">ajustée du risque · ${esc((d.portefeuille&&d.portefeuille.statut)||"")}</div></div>
+    <div class="metric"><div class="k">Initiatives retenues</div><div class="n">${sel.size} / ${(d.initiatives||[]).length}</div><div class="s">budget et capacité respectés</div></div>
+    <div class="metric"><div class="k">Connecteurs à ajouter</div><div class="n">${(arch.connecteurs_a_ajouter||[]).length}</div><div class="s">${esc((arch.connecteurs_a_ajouter||[]).join(", ")||"—")}</div></div>
+    <div class="metric"><div class="k">Agents mobilisés</div><div class="n">${(arch.agents_mobilises||[]).length}</div><div class="s">architecture cible</div></div>
+  </section>
+  <section class="panel flush" style="margin-top:12px"><div class="table-wrap"><table>
+    <thead><tr><th>Initiative</th><th class="num">Gain brut/an</th><th class="num">Probabilité</th><th class="num">Risque</th><th class="num">Valeur ajustée</th><th>Agents</th><th></th></tr></thead>
+    <tbody>${(d.initiatives||[]).map(i=>`<tr><td><b>${esc(i.titre)}</b><div class="small muted">${esc(i.base_calcul||"")}</div></td>
+      <td class="num">${eur(i.gain_annuel_brut)}</td><td class="num">${pct(i.probabilite_succes)}</td><td class="num">${pct(i.risque)}</td>
+      <td class="num"><b>${eur(i.valeur_ajustee_risque)}</b></td>
+      <td><div class="chips">${(i.agents||[]).map(a=>`<span class="chip">${esc(lab(a))}</span>`).join("")}</div></td>
+      <td>${sel.has(i.id)?statusPill("ok","Retenue"):'<span class="status">En réserve</span>'}</td></tr>`).join("")}</tbody>
+  </table></div>
+  <p class="small muted" style="margin:0;padding:10px 12px">${esc((d.hypotheses&&d.hypotheses.note)||"")}</p></section>`;
+},
+agents(d){
+  return `${head("Vos agents",`Créés automatiquement pour votre secteur (${esc(d.genesis&&d.genesis.famille||"")} · ${esc(d.genesis&&d.genesis.methode_secteur||"")}), testés et attaqués avant activation.`)}
+  <section class="panel flush"><ul class="roster">${(d.agents||[]).map(a=>{
+    const on=a.statut==="actif";
+    return `<li><div class="who"><span class="av">${esc(lab(a.id).slice(0,2).toUpperCase())}</span><div><div class="nm">${esc(lab(a.id))}</div><div class="ms">${esc(a.mission||"")}</div></div></div>
+    <div><div style="margin-bottom:6px">${on?statusPill("ok","Actif"):statusPill("warn","Bloqué par la porte")}</div>
+    <div class="chips">${(a.objets_lecture||[]).slice(0,4).map(o=>`<span class="chip">${o==="*"?"tout (orchestration)":esc(o)}</span>`).join("")}</div>
+    <p class="small muted" style="margin:6px 0 0">${a.expertise?`Expertise vérifiée : <b style="color:var(--text)">${pct(a.expertise.taux_verification)}</b> · ${esc(a.expertise.regles)} règles citées${a.expertise.cache?" · bibliothèque":""}`:"Noyau du métasystème"}</p>
+    <p class="small muted" style="margin:2px 0 0">${a.brouillons?"Brouillons à valider":"Lecture seule"} · ${a.habilitation_pii?"données personnelles habilitées":"sans données personnelles"} · paiement : jamais</p>
+    </div></li>`;
+  }).join("")}</ul></section>`;
+},
+validations(d){
+  const all=d.actions||[];
+  const P=all.filter(a=>a.statut==="a_valider"), H=all.filter(a=>a.statut!=="a_valider");
+  return `${head("Validations","Rien d'engageant ne part sans vous. Un clic pour valider, un clic pour refuser.")}
+  ${P.map(a=>{let x={}; try{x=JSON.parse(a.apres||"{}")}catch(e){}
+    return `<section class="panel" style="margin-bottom:10px"><div class="act"><div class="ic">${ico(ACT_ICO[a.action]||"check")}</div>
+    <div><b>${esc(lab(a.action))}</b> <span class="muted">· ${esc(a.cible)}</span>
+    <div class="small muted">proposé par ${esc(lab(a.acteur))} · ${new Date(a.ts*1000).toLocaleString("fr-FR")}</div>
+    ${detail(a.action,x)}</div>
+    <div class="actions" style="display:flex;flex-direction:column;gap:6px"><button class="btn sm" onclick="decide(${Number(a.id)},true)">Valider</button><button class="btn danger sm" onclick="decide(${Number(a.id)},false)">Refuser</button></div>
+    </div></section>`;
+  }).join("")||'<section class="panel"><p class="empty">Aucune validation en attente.</p></section>'}
+  ${H.length?`<h3 class="panel-h" style="margin-top:18px">Historique</h3><section class="panel flush"><div class="table-wrap"><table><tbody>${H.map(a=>`<tr><td>${esc(lab(a.action))}</td><td class="muted">${esc(a.cible)}</td><td>${a.statut==="approuvee"?statusPill("ok","Approuvée"):statusPill("bad","Refusée")}</td></tr>`).join("")}</tbody></table></div></section>`:""}`;
+},
+documents(d){
+  const docs=d.documents||[];
+  return `${head("Documents","Produits par votre suite bureautique intégrée (Word, Excel avec formules, PowerPoint, PDF).")}
+  <section class="panel flush">${docs.length?`<ul class="docs">${docs.map(f=>`<li class="docrow"><span class="ft">${esc(String(f.type||"").slice(0,4).toUpperCase())}</span><div><b>${esc(f.nom)}</b><div class="small muted">${fmt(f.taille_ko,1)} Ko</div></div><button class="btn ghost sm" onclick="dl('${esc(f.nom)}')">Télécharger</button></li>`).join("")}</ul>`:'<p class="empty" style="padding:14px">Aucun document.</p>'}</section>`;
+},
+connecteurs(d){
+  return `${head("Connecteurs","Détectés depuis vos outils. Déposez vos exports pour démarrer tout de suite ; connectez vos comptes pour la synchronisation continue.")}
+  <label class="drop"><span class="i" style="width:20px;height:20px">${ico("upload")}</span><b>Déposez un FEC, des factures, des ventes (CSV, XLSX)</b><span class="small">Reconnu automatiquement et ajouté à votre jumeau — puis vos agents se reconfigurent.</span><input type="file" id="f" onchange="up(this.files[0])"></label>
+  <section class="panel flush" style="margin-top:12px"><ul class="conns">${(d.connecteurs||[]).map(c=>`<li class="conn">
+    <div><div class="nm">${esc(lab(c.id))}</div><div class="small muted">${esc(c.categorie||"")}${c.serveur_mcp?" · serveur MCP : "+esc(c.serveur_mcp):""}</div></div>
+    <div class="chips">${(c.outils||[]).map(o=>`<span class="chip">${esc(o)}</span>`).join("")}</div>
+    <div>${c.connecte?statusPill("ok","Actif"):`<button class="btn sm" onclick="conn('${esc(c.id)}')">Connecter</button>`}</div>
+  </li>`).join("")}</ul></section>`;
+},
+metasysteme(d){
+  const g=d.genesis||{};
+  const pass=g.passerelle==null?"—":/bloqu/i.test(String(g.passerelle))?String(g.passerelle):String(g.passerelle)+" bloquées";
+  const rt=g.red_team||{};
+  const lib=d.bibliotheque||{};
+  const cards=[
+    ["Onboarding complet", fmt(g.duree_totale_s,2)+" s", fmt((g.cout_total_usd||0)*0.92,3)+" € de calcul IA"],
+    ["Politiques testées", esc(g.politiques&&g.politiques.tests), "refus par défaut, forbid prioritaire"],
+    ["Actions interdites forcées", esc(pass), "modèle supposé compromis"],
+    ["Red team", (rt.defenses_reussies??"—")+" / "+(rt.attaques??"—"), (rt.interdits_executes??0)+" action interdite exécutée"]
+  ];
+  return `${head("Métasystème","La couche de contrôle qui a créé, testé et activé vos agents — et qui continue de les faire progresser.")}
+  <section class="panel metrics m4">${cards.map(([l,v,s])=>`<div class="metric"><div class="k">${l}</div><div class="n">${v}</div><div class="s">${s}</div></div>`).join("")}</section>
+  <div class="cols-2" style="margin-top:12px">
+    <section class="panel"><h3 class="panel-h">Genesis — étapes chronométrées</h3><div class="steps">${(g.etapes||[]).map(s=>`<div class="step"><i></i><span>${esc(s.etape)}</span><span class="num muted">${fmt(s.duree_s,2)} s</span><span class="num muted">${fmt((s.cout_usd||0)*0.92,4)} €</span></div>`).join("")}</div></section>
+    <section class="panel"><h3 class="panel-h">Volant d'inertie</h3>
+      <p class="small muted">Chaque onboarding publie des modèles anonymisés (jamais de données client) : packs d'expertise, prompts, connecteurs, politiques, skills. L'entreprise suivante démarre plus vite et pour moins cher.</p>
+      <div class="chips">${Object.entries(lib.elements||{}).map(([k,n])=>`<span class="chip">${esc(k)} · ${esc(n)}</span>`).join("")}</div>
+      <div class="cols-2" style="margin-top:12px">
+        <div><div class="k faint small">Réutilisations</div><div class="n" style="font-size:18px;font-weight:600">${fmt(lib.reutilisations)}</div></div>
+        <div><div class="k faint small">IA économisée</div><div class="n" style="font-size:18px;font-weight:600">${fmt((lib.economie_ia_usd||0)*0.92,3)} €</div></div>
+      </div>
+      <h3 class="panel-h" style="margin-top:16px">Journal d'audit</h3>
+      ${(d.audit&&d.audit.ok)?statusPill("ok","Chaîne intègre"):statusPill("bad","Rupture détectée")}
+      <span class="small muted"> · ${fmt(d.audit&&d.audit.entrees)} entrées</span>
+    </section>
+  </div>`;
+},
+reglages(d){
+  const cur=d.tenant&&d.tenant.plan;
+  const u=d.usage||{};
+  const w=u.incluses?Math.min(100,100*u.taches/u.incluses):0;
+  return `${head("Réglages & offre","Abonnement + usage. Aucun frais de mise en place.")}
+  <div class="plans">${Object.entries(d.plans||{}).map(([k,p])=>`<section class="panel plan ${k===cur?"is-current":""}">
+    <h3 class="panel-h">${esc(k[0].toUpperCase()+k.slice(1))}</h3>
+    <div class="price">${fmt(p.prix_mois_eur)} €<span class="small muted"> HT/mois</span></div>
+    <p class="small muted" style="margin:0">${fmt(p.taches_incluses)} tâches incluses · 0 € de mise en place</p>
+  </section>`).join("")}</div>
+  <div class="cols-2" style="margin-top:12px">
+    <section class="panel"><h3 class="panel-h">Consommation du mois</h3>
+      <div class="n" style="font-size:22px;font-weight:600">${fmt(u.taches)} <span class="small muted">/ ${fmt(u.incluses)} tâches</span></div>
+      <div class="track" style="margin-top:10px"><i style="width:${w}%"></i></div>
+      <p class="small muted">Tâche supplémentaire : 0,90 € HT · supplément à ce jour : ${eur(u.a_facturer_sup_eur)}</p>
+    </section>
+    <section class="panel"><h3 class="panel-h">Sécurité</h3><ul class="checks">
+      ${["Données, mémoire, coffre et journal isolés pour votre entreprise","Secrets chiffrés, jamais visibles des agents","Aucun paiement par un agent, jamais","Envois et écritures uniquement après votre validation","Journal d'audit chaîné et vérifiable"].map(t=>`<li>${ico("check")}<span>${t}</span></li>`).join("")}
+    </ul></section>
+  </div>`;
+}
 };
+function chipOk(ok){return ok?'<span class="chip">Vérifié par le réviseur</span>':'<span class="chip">Bloqué par le réviseur</span>'}
 function detail(t,x){
- if(x.corps)return `<pre>${x.objet?"Objet : "+esc(x.objet)+"\n\n":""}${esc(x.corps)}</pre>`;
- if(x.actuel&&x.propose)return `<table style="margin-top:10px;max-width:560px"><tr><th>Canal</th><th class="num">Actuel</th><th class="num">Proposé</th><th class="num">Écart</th></tr>${Object.keys(x.actuel).map(c=>`<tr><td>${esc(c.replace("_"," "))}</td><td class="num">${eur(x.actuel[c])}</td><td class="num"><b>${eur(x.propose[c])}</b></td><td class="num" style="color:${x.propose[c]>=x.actuel[c]?"var(--ok)":"var(--bad)"}">${x.propose[c]>=x.actuel[c]?"+":""}${eur(x.propose[c]-x.actuel[c])}</td></tr>`).join("")}</table><div class="small muted" style="margin-top:8px">Gain modélisé : <b style="color:#fff">+${eur(x.gain_estime)}</b> par période, à budget constant.</div>`;
- if(x.references)return `<div class="chips" style="margin-top:10px">${x.references.map(r=>`<span class="chip">${esc(r)}</span>`).join("")}</div>`;
- return `<pre>${esc(JSON.stringify(x,null,1))}</pre>`}
-
-function nba(d){const L=(d.copilote&&d.copilote.actions)||[];if(!L.length)return "";
- const rows=L.slice(0,5).map((a,i)=>`<div class="nba-row"><div class="nba-n">${i+1}</div>
-  <div><b>${esc(a.titre)}</b>${a.valeur_attendue_eur?`<span class="pill" style="margin-left:8px">${eurc(a.valeur_attendue_eur)}${a.kind==="valider"?"":" / an"}</span>`:""}${a.preuve_similaire?`<span class="chip" style="margin-left:6px">${a.preuve_similaire} entreprise${a.preuve_similaire>1?"s":""} similaire${a.preuve_similaire>1?"s":""}</span>`:""}
-  <div class="small muted" style="margin-top:4px">${esc(a.pourquoi)}</div></div>
-  <div style="display:flex;flex-direction:column;gap:6px;min-width:118px">
-    <button class="btn sm" onclick="nbaGo('${a.id}',true)">${esc(a.verbe||"Activer")}</button>
-    <button class="btn ghost sm" onclick="nbaGo('${a.id}',false)">Plus tard</button>
-  </div></div>`).join("");
- return `<div class="card hl nba"><h3>Copilote d'activation <span class="pill ok"><span class="dot"></span>Sans appel IA</span></h3>
-  <p class="small muted" style="margin:-4px 0 8px">${esc((d.copilote&&d.copilote.message)||"Voici ce que je ferais en premier.")}</p>${rows}</div>`}
-async function nbaGo(id,ok){const r=await api(`/tenants/${S.t}/copilote/${id}/${ok?"activer":"plus-tard"}`,{method:"POST",body:"{}"});
- if(!ok){toast(r.message||"Bien, on verra plus tard.");await load();return}
- if(r.statut==="redirection"&&r.url){location.href=r.url;return}
- if(r.statut==="ouvrir_import"||r.statut==="application_oauth_manquante"){toast(r.message||r.repli||"Ouvrez Connecteurs pour déposer un fichier.");go("connecteurs");return}
- if(r.vue){toast(r.message||"C'est noté.");S.view=r.vue;await load();return}
- toast(r.message||"C'est fait.");await load()}
-function openPal(){const el=$("#pal");el.classList.add("on");filterPal();const i=$("#palq");if(i){i.value="";i.focus()}PAL.i=0}
+  if(x.corps) return `<div class="pre">${x.objet?"Objet : "+esc(x.objet)+"\n\n":""}${esc(x.corps)}</div>`;
+  if(x.actuel&&x.propose) return `<div class="table-wrap"><table style="margin-top:10px"><thead><tr><th>Canal</th><th class="num">Actuel</th><th class="num">Proposé</th><th class="num">Écart</th></tr></thead><tbody>${Object.keys(x.actuel).map(c=>{const delta=x.propose[c]-x.actuel[c]; return `<tr><td>${esc(String(c).replaceAll("_"," "))}</td><td class="num">${eur(x.actuel[c])}</td><td class="num"><b>${eur(x.propose[c])}</b></td><td class="num" style="color:${delta>=0?"var(--ok)":"var(--bad)"}">${delta>=0?"+":""}${eur(delta)}</td></tr>`}).join("")}</tbody></table></div><p class="small muted">Gain modélisé : <b style="color:var(--text)">+${eur(x.gain_estime)}</b> par période, à budget constant.</p>`;
+  if(x.references) return `<div class="chips" style="margin-top:8px">${x.references.map(r=>`<span class="chip">${esc(r)}</span>`).join("")}</div>`;
+  return `<pre class="code">${esc(JSON.stringify(x,null,1))}</pre>`;
+}
+function nba(d){
+  const L=(d.copilote&&d.copilote.actions)||[];
+  if(!L.length) return "";
+  const rows=L.slice(0,5).map((a,i)=>`<li class="nba-row"><div class="rank">${i+1}</div>
+    <div><div class="nba-title">${esc(a.titre)}</div><p class="nba-why">${esc(a.pourquoi||"")}${a.preuve_similaire?` <span class="chip">${a.preuve_similaire} entreprise${a.preuve_similaire>1?"s":""} similaire${a.preuve_similaire>1?"s":""}</span>`:""}</p></div>
+    <div class="nba-side">${a.valeur_attendue_eur?`<span class="val">${eurc(a.valeur_attendue_eur)}${a.kind==="valider"?"":" / an"}</span>`:""}
+      <div class="nba-actions"><button class="btn sm" onclick="nbaGo('${a.id}',true)">${esc(a.verbe||"Activer")}</button><button class="btn ghost sm" onclick="nbaGo('${a.id}',false)">Plus tard</button></div>
+    </div></li>`).join("");
+  return `<section class="panel nba"><div class="panel-h"><h3>Copilote d'activation</h3>${statusPill("ok","Sans appel IA")}</div>
+    <p class="lead">${esc((d.copilote&&d.copilote.message)||"Voici ce que je ferais en premier.")}</p><ol class="nba-list">${rows}</ol></section>`;
+}
+async function nbaGo(id,ok){
+  const r=await api(`/tenants/${S.t}/copilote/${id}/${ok?"activer":"plus-tard"}`,{method:"POST",body:"{}"});
+  if(!ok){toast(r.message||"Bien, on verra plus tard."); await load(); return}
+  if(r.statut==="redirection"&&r.url){location.href=r.url; return}
+  if(r.statut==="ouvrir_import"||r.statut==="application_oauth_manquante"){toast(r.message||r.repli||"Ouvrez Connecteurs pour déposer un fichier."); go("connecteurs"); return}
+  if(r.vue){toast(r.message||"C'est noté."); S.view=r.vue; await load(); return}
+  toast(r.message||"C'est fait."); await load();
+}
+function openPal(){const el=$("#pal"); if(!el) return; el.classList.add("on"); PAL.i=0; const i=$("#palq"); if(i){i.value=""; filterPal(); i.focus()}}
 function closePal(){$("#pal")?.classList.remove("on")}
-function palItems(){const q=($("#palq")?.value||"").toLowerCase().trim();const acts=((S.d||{}).copilote||{}).actions||[];
- const nav=NAV.map(([k,l])=>({kind:"nav",id:k,titre:"Aller à "+l,pourquoi:"Navigation",verbe:"Ouvrir"}));
- return [...acts,...nav].filter(a=>!q||(a.titre+" "+(a.pourquoi||"")).toLowerCase().includes(q))}
-function filterPal(){const items=palItems();PAL.i=Math.min(PAL.i,Math.max(0,items.length-1));
- $("#palhits").innerHTML=items.map((a,i)=>`<div class="hit ${i===PAL.i?"on":""}" onmouseenter="PAL.i=${i}" onclick="palRun(${i})">
-  <div><b>${esc(a.titre)}</b><div class="small muted">${esc(a.pourquoi||"")}</div></div>
-  <div>${a.kind==="nav"?`<span class="hintk">↵</span>`:`<span class="btn sm">${esc(a.verbe||"Activer")}</span>`}</div></div>`).join("")||'<div class="hit muted">Aucune action.</div>'}
-function navPal(e){const n=palItems().length;if(e.key==="Escape"){e.preventDefault();closePal()}
- else if(e.key==="ArrowDown"){e.preventDefault();PAL.i=Math.min(n-1,(PAL.i||0)+1);filterPal()}
- else if(e.key==="ArrowUp"){e.preventDefault();PAL.i=Math.max(0,(PAL.i||0)-1);filterPal()}
- else if(e.key==="Enter"){e.preventDefault();palRun(PAL.i||0)}}
-async function palRun(i){const a=palItems()[i];if(!a)return;closePal();if(a.kind==="nav"){go(a.id);return}await nbaGo(a.id,true)}
+function toggleHelp(){const h=$("#help"); if(!h) return; h.classList.toggle("on")}
+function closeHelp(){$("#help")?.classList.remove("on")}
+function toggleNav(){document.getElementById("side")?.classList.toggle("open"); document.getElementById("back")?.classList.toggle("show")}
+function closeNav(){document.getElementById("side")?.classList.remove("open"); document.getElementById("back")?.classList.remove("show")}
+function setTheme(t){
+  try{localStorage.setItem("exior_theme", t)}catch(e){}
+  document.documentElement.setAttribute("data-theme", t==="light"?"light":"dark");
+  syncTheme();
+}
+function syncTheme(){
+  const t=document.documentElement.getAttribute("data-theme");
+  const d=document.getElementById("th-dark"), l=document.getElementById("th-light");
+  if(d) d.setAttribute("aria-pressed", t==="dark"?"true":"false");
+  if(l) l.setAttribute("aria-pressed", t==="light"?"true":"false");
+}
+function palItems(){
+  const q=($("#palq")?.value||"").toLowerCase().trim();
+  const acts=((S.d||{}).copilote||{}).actions||[];
+  const nav=NAV.map(([k,l])=>({kind:"nav", id:k, titre:"Aller à "+l, pourquoi:"Navigation", verbe:"Ouvrir"}));
+  return [...acts, ...nav].filter(a=>!q||(a.titre+" "+(a.pourquoi||"")).toLowerCase().includes(q));
+}
+function filterPal(){
+  const items=palItems();
+  PAL.i=Math.min(PAL.i||0, Math.max(0, items.length-1));
+  const box=$("#palhits"); if(!box) return;
+  if(!items.length){box.innerHTML='<div class="hit muted">Aucune action.</div>'; return}
+  let html="", last="";
+  items.forEach((a,i)=>{
+    const g=a.kind==="nav"?"Navigation":"Actions";
+    if(g!==last){html+=`<div class="pal-g">${g}</div>`; last=g}
+    html+=`<button type="button" class="hit ${i===PAL.i?"on":""}" onmouseenter="PAL.i=${i};markPal()" onclick="palRun(${i})"><span class="hit-t"><b>${esc(a.titre)}</b><span class="muted">${esc(a.pourquoi||"")}</span></span><span class="hit-k">${a.kind==="nav"?"Ouvrir":esc(a.verbe||"Activer")}</span></button>`;
+  });
+  box.innerHTML=html;
+}
+function markPal(){document.querySelectorAll("#palhits .hit").forEach((el,i)=>el.classList.toggle("on", i===PAL.i))}
+function navPal(e){
+  const n=palItems().length;
+  if(e.key==="Escape"){e.preventDefault(); closePal()}
+  else if(e.key==="ArrowDown"){e.preventDefault(); PAL.i=Math.min(n-1,(PAL.i||0)+1); filterPal()}
+  else if(e.key==="ArrowUp"){e.preventDefault(); PAL.i=Math.max(0,(PAL.i||0)-1); filterPal()}
+  else if(e.key==="Enter"){e.preventDefault(); palRun(PAL.i||0)}
+}
+async function palRun(i){const a=palItems()[i]; if(!a) return; closePal(); if(a.kind==="nav"){go(a.id); return} await nbaGo(a.id,true)}
 const PAL={i:0};
-addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("#pal")?.classList.contains("on")?closePal():openPal()}});
+let CHORD=null, CHORD_T=0;
+addEventListener("keydown", e=>{
+  const t=e.target;
+  const typing=t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.isContentEditable);
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault(); $("#pal")?.classList.contains("on")?closePal():openPal(); return}
+  if(e.key==="Escape"){closePal(); closeHelp(); closeNav(); return}
+  if(typing) return;
+  if(e.key==="?"){e.preventDefault(); toggleHelp(); return}
+  if(e.key==="["){e.preventDefault(); toggleNav(); return}
+  if(e.shiftKey&&(e.key==="T"||e.key==="t")){e.preventDefault(); setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"); return}
+  if(CHORD==="g"){const id=GO[(e.key||"").toLowerCase()]; CHORD=null; if(id){e.preventDefault(); go(id)} return}
+  if((e.key==="g"||e.key==="G")&&!e.metaKey&&!e.ctrlKey&&!e.altKey){CHORD="g"; clearTimeout(CHORD_T); CHORD_T=setTimeout(()=>{CHORD=null},900)}
+});
 
-function render(){ if(!S.t||!S.k){$("#root").innerHTML=`<div class="login card hl"><div class="mark" style="margin:0 auto 14px;width:48px;height:48px">E</div><h2>EXIOR Meta OS</h2><p class="muted">Connectez-vous à votre espace</p><input id="lt" placeholder="Identifiant entreprise"><input id="lk" type="password" placeholder="Jeton d'accès"><button class="btn" style="width:100%;justify-content:center;margin-top:8px" onclick="S.t=lt.value;S.k=lk.value;localStorage.setItem('exior_t',S.t);localStorage.setItem('exior_k',S.k);load()">Entrer</button></div>`;return}
- const d=S.d;if(!d)return; const pend=d.actions.filter(a=>a.statut=="a_valider").length,u=d.usage;
- $("#root").innerHTML=`<div class="app"><aside><div class="logo"><div class="mark">E</div><div><b>EXIOR</b><small>META OS</small></div></div>
- ${NAV.map(([k,l])=>`<div class="nav ${S.view==k?"on":""}" onclick="go('${k}')">${ico(k)}<span>${l}</span>${k=="validations"&&pend?`<span class="cnt">${pend}</span>`:""}</div>`).join("")}
- <div class="side-foot"><b>Agents experts actifs</b><br>${fmt(Object.values(d.jumeau).reduce((a,b)=>a+b,0))} objets dans le jumeau<br><span style="color:var(--v3)">Métasystème opérationnel</span><div class="small muted" style="margin-top:8px">Démo — entreprise fictive</div></div></aside>
- <main><div class="top"><button class="btn ghost sm burger" onclick="document.querySelector('aside').classList.toggle('open')" aria-label="Menu">☰</button><div><h1>${esc(d.tenant.raison_sociale)}</h1><div class="sub">${esc(NAV.find(n=>n[0]==S.view)[1])}</div></div><span class="pill ok"><span class="dot"></span>${d.tenant.statut=="actif"?"Actif":esc(d.tenant.statut)}</span><span class="pill">Offre ${esc(d.tenant.plan)}</span><div class="sp"></div>
- <div class="meter"><small>${fmt(u.taches)} / ${fmt(u.incluses)} tâches ce mois</small><div class="bar"><i style="width:${Math.min(100,100*u.taches/u.incluses)}%"></i></div></div><button class="btn ghost sm" onclick="openPal()" title="Palette de commandes">⌘K</button><button class="btn sm" onclick="go('conversation')">✦ Demander</button></div>
- <div class="view">${V[S.view](d)}</div></main></div>`;
- const m=$("#msgs");if(m)m.scrollTop=m.scrollHeight}
-function go(v){S.view=v;location.hash="#/"+v;render();document.querySelector('aside')?.classList.remove('open')}
-async function load(){S.d=appliquer(); render(); if(Q.get("palette")==="1")openPal()}
-async function ask(t){const q=t||$("#q").value.trim();if(!q)return;const m=$("#msgs");m.insertAdjacentHTML("beforeend",`<div class="m u">${esc(q)}</div><div class="m a" id="pending">…</div>`);m.scrollTop=m.scrollHeight;if($("#q"))$("#q").value="";
- try{const r=await api(`/tenants/${S.t}/chat`,{method:"POST",body:JSON.stringify({message:q})});$("#pending").outerHTML=`<div class="m a">${esc(r.reponse)}<div class="meta"><span class="chip ${r.revue.ok?"g":""}">${r.revue.ok?"✓ vérifié par le réviseur":"bloqué par le réviseur"}</span><span class="chip">${esc(r.modele)}</span>${r.escalade?'<span class="chip">escalade</span>':""}${r.skill?'<span class="chip">skill appris</span>':""}${r.outils.map(o=>`<span class="chip">${o}</span>`).join("")}<span>${fmt(r.cout_usd*0.92,4)} €</span></div></div>`;S.d.usage.taches++}catch(e){$("#pending").textContent="Erreur : "+e.message}}
-async function decide(id,ok){await api(`/tenants/${S.t}/actions/${id}`,{method:"POST",body:JSON.stringify({approuve:ok})});toast(ok?"Validé — exécution déclenchée par le connecteur":"Refusé");await load()}
-async function dl(n){const href=DOCS[n]||("docs/"+encodeURIComponent(n)); window.open(href, "_blank", "noopener")}
-async function up(f){if(!f)return;toast("Démo : le fichier « "+f.name+" » serait reconnu et ajouté au jumeau. Dans l'espace client, les agents se reconfigurent ensuite.");}
-async function conn(c){toast("Démo : la connexion continue à "+c.replace(/_/g," ")+" sera disponible dans l'espace client. En attendant, déposez un export — ça fonctionne déjà.")}
-addEventListener("hashchange",()=>{const v=location.hash.slice(2);if(V[v]&&v!=S.view){S.view=v;render()}});
-if(!V[S.view])S.view="tableau"; S.t="demo"; S.k="demo"; load();
+function render(){
+  if(!S.t||!S.k){
+    $("#root").innerHTML=`<div class="gate"><form class="panel" onsubmit="event.preventDefault(); const t=document.getElementById('lt'), k=document.getElementById('lk'); S.t=t.value.trim(); S.k=k.value; localStorage.setItem('exior_t',S.t); localStorage.setItem('exior_k',S.k); load()">
+      <div class="mark" style="width:32px;height:32px">E</div>
+      <h2>EXIOR Meta OS</h2>
+      <p class="muted" style="margin:0">Connectez-vous à votre espace</p>
+      <label class="field">Identifiant entreprise<input id="lt" autocomplete="username" placeholder="Identifiant entreprise"></label>
+      <label class="field">Jeton d'accès<input id="lk" type="password" autocomplete="current-password" placeholder="Jeton d'accès"></label>
+      <button class="btn block" style="margin-top:14px" type="submit">Entrer</button>
+    </form></div>`;
+    return;
+  }
+  const d=S.d;
+  if(!d){$("#root").innerHTML=`<div class="gate"><p class="muted">Chargement…</p></div>`; return}
+  const pend=(d.actions||[]).filter(a=>a.statut==="a_valider").length;
+  const u=d.usage||{};
+  const w=u.incluses?Math.min(100,100*(u.taches||0)/u.incluses):0;
+  const theme=document.documentElement.getAttribute("data-theme")==="light"?"light":"dark";
+  const section=(NAV.find(n=>n[0]===S.view)||NAV[0])[1];
+  const actifs=(d.agents||[]).filter(a=>a.statut==="actif").length;
+  const objets=Object.values(d.jumeau||{}).reduce((a,b)=>a+(Number(b)||0),0);
+  $("#root").innerHTML=`<div class="app">
+    <aside class="side" id="side">
+      <div class="brand"><div class="mark" aria-hidden="true">E</div><div class="brand-name">EXIOR<small>Meta OS</small></div></div>
+      <button type="button" class="cmd-launch" onclick="openPal()">${ico("search")}<span>Rechercher une action</span><kbd>⌘K</kbd></button>
+      <nav class="navs" aria-label="Sections">${NAV.map(([k,l,key])=>`<button type="button" class="nav ${S.view===k?"on":""}" ${S.view===k?'aria-current="page"':""} onclick="go('${k}')" title="Raccourci : G puis ${key}">${ico(k)}<span class="nav-l">${l}</span>${k==="validations"&&pend?`<span class="cnt">${pend}</span>`:""}<kbd>${key}</kbd></button>`).join("")}</nav>
+      <div class="side-foot"><b>${actifs} agents actifs</b><br>${fmt(objets)} objets dans le jumeau<br>Métasystème opérationnel${window.EXIOR_PAGES_DEMO?'<div class="small" style="margin-top:8px">Démo — entreprise fictive</div>':""}</div>
+    </aside>
+    <button type="button" class="backdrop" id="back" aria-label="Fermer le menu" onclick="closeNav()"></button>
+    <div class="workspace">
+      <header class="top">
+        <button type="button" class="iconbtn burger" onclick="toggleNav()" aria-label="Menu">${ico("menu")}</button>
+        <div class="crumb"><h1>${esc(d.tenant&&d.tenant.raison_sociale||"")}</h1><span class="faint">/</span><span class="viewname">${esc(section)}</span></div>
+        ${statusPill(d.tenant&&d.tenant.statut==="actif"?"ok":"warn", d.tenant&&d.tenant.statut==="actif"?"Actif":esc(d.tenant&&d.tenant.statut||""))}
+        <span class="chip">Offre ${esc(d.tenant&&d.tenant.plan||"")}</span>
+        <div class="sp"></div>
+        <div class="usage"><small>${fmt(u.taches)} / ${fmt(u.incluses)} tâches ce mois</small><div class="track"><i style="width:${w}%"></i></div></div>
+        <div class="seg" role="group" aria-label="Thème graphite">
+          <button type="button" id="th-dark" aria-pressed="${theme==="dark"}" onclick="setTheme('dark')">Noir</button>
+          <button type="button" id="th-light" aria-pressed="${theme==="light"}" onclick="setTheme('light')">Blanc</button>
+        </div>
+        <button type="button" class="iconbtn helpbtn" onclick="toggleHelp()" aria-label="Raccourcis clavier" title="Raccourcis (?)">?</button>
+        <button type="button" class="btn" onclick="go('conversation')">Demander</button>
+      </header>
+      <main class="view" id="contenu">${(V[S.view]||V.tableau)(d)}</main>
+    </div>
+  </div>`;
+  const m=$("#msgs"); if(m) m.scrollTop=m.scrollHeight;
+  syncTheme();
+}
+function go(v){closeHelp(); closePal(); S.view=v; location.hash="#/"+v; render()}
+async function load(){
+  if(window.EXIOR_PAGES_DEMO&&window.exiorDemoApply){
+    S.t="demo"; S.k="demo";
+    S.d=window.exiorDemoApply();
+    render();
+    if(Q.get("palette")==="1") openPal();
+    return;
+  }
+  try{
+    S.d=await api(`/tenants/${S.t}/dashboard`);
+    S.d._hist=S.d.historique_ventes||[];
+    render();
+    if(Q.get("palette")==="1") openPal();
+  }catch(e){
+    localStorage.removeItem("exior_k"); S.k=null; render(); toast("Accès refusé");
+  }
+}
+async function ask(t){
+  const q=(t||($("#q")&&$("#q").value)||"").trim(); if(!q) return;
+  const m=$("#msgs"); if(!m) return;
+  m.insertAdjacentHTML("beforeend", `<div class="m u">${esc(q)}</div><div class="m a" id="pending">…</div>`);
+  m.scrollTop=m.scrollHeight;
+  if($("#q")) $("#q").value="";
+  try{
+    const r=await api(`/tenants/${S.t}/chat`,{method:"POST", body:JSON.stringify({message:q})});
+    const pending=$("#pending");
+    if(pending) pending.outerHTML=`<div class="m a">${esc(r.reponse)}<div class="meta">${chipOk(r.revue&&r.revue.ok)}<span class="chip">${esc(r.modele)}</span>${r.escalade?'<span class="chip">escalade</span>':""}${r.skill?'<span class="chip">skill appris</span>':""}${(r.outils||[]).map(o=>`<span class="chip">${esc(o)}</span>`).join("")}<span class="chip">${fmt((r.cout_usd||0)*0.92,4)} €</span></div></div>`;
+    if(S.d&&S.d.usage) S.d.usage.taches++;
+  }catch(err){const p=$("#pending"); if(p) p.textContent="Erreur : "+err.message}
+}
+async function decide(id,ok){await api(`/tenants/${S.t}/actions/${id}`,{method:"POST", body:JSON.stringify({approuve:ok})}); toast(ok?"Validé — exécution déclenchée par le connecteur":"Refusé"); await load()}
+async function dl(n){if(window.exiorDemoDl) return window.exiorDemoDl(n); const b=await api(`/tenants/${S.t}/documents/${encodeURIComponent(n)}`); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=n; a.click()}
+async function up(f){
+  if(window.exiorDemoUp) return window.exiorDemoUp(f);
+  if(!f) return;
+  const r=await fetch(`/tenants/${S.t}/fichiers?nom=${encodeURIComponent(f.name)}`,{method:"POST", headers:{"Authorization":"Bearer "+S.k}, body:await f.arrayBuffer()});
+  const j=await r.json();
+  toast(j.type?`${j.lignes} lignes importées comme ${j.type} — reconfiguration en cours`:"Fichier non reconnu : colonnes à associer");
+  setTimeout(load,1500);
+}
+async function conn(c){
+  if(window.exiorDemoConn) return window.exiorDemoConn(c);
+  const r=await api(`/tenants/${S.t}/oauth/${c}/start`);
+  if(r.url) location.href=r.url;
+  else toast(r.statut==="application_oauth_manquante"?"Connexion OAuth bientôt disponible — l'import de fichiers fonctionne déjà":r.statut);
+}
+addEventListener("hashchange", ()=>{const v=location.hash.slice(2); if(V[v]&&v!==S.view){S.view=v; render()}});
+if(!V[S.view]) S.view="tableau";
+if(window.EXIOR_PAGES_DEMO){S.t="demo"; S.k="demo"; load()}
+else if(S.t&&S.k) load();
+else render();
 </script>
 </body>
 </html>
